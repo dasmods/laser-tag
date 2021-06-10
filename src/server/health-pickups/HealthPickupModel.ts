@@ -26,7 +26,13 @@ export class HealthPickupModel {
 	}
 
 	heal(humanoid: Humanoid) {
-		humanoid.Health += HealthPickupsConstants.HEAL_AMOUNT;
+		if (!this.isEnabled()) {
+			return;
+		}
+		if (humanoid.Health === 100) {
+			return;
+		}
+		humanoid.Health = math.min(100, humanoid.Health + HealthPickupsConstants.HEAL_AMOUNT);
 		this.cooldown();
 	}
 

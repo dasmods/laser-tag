@@ -6,10 +6,6 @@ const getHumanoid = (part: BasePart) => {
 };
 
 const onTouched = (otherPart: BasePart, healthPickup: HealthPickupModel) => {
-	if (!healthPickup.isEnabled()) {
-		return;
-	}
-
 	const humanoid = getHumanoid(otherPart);
 	if (!humanoid) {
 		return;
