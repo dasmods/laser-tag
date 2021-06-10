@@ -25,19 +25,19 @@ export class HealthPickupModel {
 		error(`unexpected attribute type for ${HealthPickupsConstants.ENABLED_ATTR}: ${typeOf(isEnabled)}`);
 	}
 
-	enable() {
+	heal(humanoid: Humanoid) {
+		humanoid.Health += HealthPickupsConstants.HEAL_AMOUNT;
+		this.cooldown();
+	}
+
+	private enable() {
 		this.basePart.SetAttribute(HealthPickupsConstants.ENABLED_ATTR, true);
 		this.makeMoreVisible();
 	}
 
-	disable() {
+	private disable() {
 		this.basePart.SetAttribute(HealthPickupsConstants.ENABLED_ATTR, false);
 		this.makeLessVisible();
-	}
-
-	heal(humanoid: Humanoid) {
-		humanoid.Health += HealthPickupsConstants.HEAL_AMOUNT;
-		this.cooldown();
 	}
 
 	private cooldown() {
