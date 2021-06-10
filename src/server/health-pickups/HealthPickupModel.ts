@@ -18,7 +18,11 @@ export class HealthPickupModel {
 	}
 
 	isEnabled(): boolean {
-		return !!this.basePart.GetAttribute(HealthPickupsConstants.ENABLED_ATTR);
+		const isEnabled = this.basePart.GetAttribute(HealthPickupsConstants.ENABLED_ATTR);
+		if (typeIs(isEnabled, "boolean")) {
+			return isEnabled;
+		}
+		error(`unexpected attribute type for ${HealthPickupsConstants.ENABLED_ATTR}: ${typeOf(isEnabled)}`);
 	}
 
 	enable() {
