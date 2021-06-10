@@ -37,9 +37,10 @@ export class HealthPickupModel {
 
 	heal(humanoid: Humanoid) {
 		humanoid.Health += HealthPickupsConstants.HEAL_AMOUNT;
+		this.cooldown();
 	}
 
-	cooldown() {
+	private cooldown() {
 		this.disable();
 		wait(HealthPickupsConstants.COOLDOWN_SEC);
 		this.enable();

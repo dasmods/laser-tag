@@ -16,7 +16,6 @@ const onTouched = (otherPart: BasePart, healthPickup: HealthPickupModel) => {
 	}
 
 	healthPickup.heal(humanoid);
-	healthPickup.cooldown();
 };
 
 export class HealthPickupsController {
