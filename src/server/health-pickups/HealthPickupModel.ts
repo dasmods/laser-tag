@@ -10,7 +10,7 @@ export class HealthPickupModel {
 	}
 
 	init() {
-		this.basePart.SetAttribute(HealthPickupsConstants.ENABLED_ATTR, true);
+		this.enable();
 	}
 
 	addTouchedEventListener(callback: TouchedCallback) {
