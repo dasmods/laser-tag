@@ -1,3 +1,3 @@
-import { makeHello } from "shared/module";
+import { HealthPickupsController } from "server/health-pickups/HealthPickupsController";
 
-print(makeHello("main.server.ts"));
+HealthPickupsController.init();
