@@ -1,3 +1,4 @@
+import { t } from "@rbxts/t";
 import { HealthPickupsConstants } from "server/health-pickups/HealthPickupsConstants";
 
 type TouchedCallback = (otherPart: BasePart, healthPickup: HealthPickupModel) => void;
@@ -23,10 +24,8 @@ export class HealthPickupModel {
 
 	isEnabled(): boolean {
 		const isEnabled = this.basePart.GetAttribute(HealthPickupsConstants.ENABLED_ATTR);
-		if (typeIs(isEnabled, "boolean")) {
-			return isEnabled;
-		}
-		error(`unexpected attribute type for ${HealthPickupsConstants.ENABLED_ATTR}: ${typeOf(isEnabled)}`);
+		assert(t.boolean(isEnabled));
+		return isEnabled;
 	}
 
 	heal(entity: HealableEntity) {
