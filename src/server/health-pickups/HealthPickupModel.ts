@@ -1,4 +1,4 @@
-import * as HealthPickupsConstants from "server/health-pickups/HealthPickupsConstants";
+import { HealthPickupsConstants } from "server/health-pickups/HealthPickupsConstants";
 
 export type TouchedCallback = (otherPart: BasePart, healthPickup: HealthPickupModel) => void;
 

@@ -1,5 +1,5 @@
 import { HealthPickupModel } from "server/health-pickups/HealthPickupModel";
-import * as HealthPickups from "server/health-pickups/HealthPickups";
+import { HealthPickups } from "server/health-pickups/HealthPickups";
 
 const getHumanoid = (part: BasePart) => {
 	return part.Parent?.FindFirstChildWhichIsA("Humanoid");
@@ -27,4 +27,6 @@ export class HealthPickupsController {
 			healthPickup.addTouchedEventListener(onTouched);
 		}
 	}
+
+	private constructor() {}
 }
