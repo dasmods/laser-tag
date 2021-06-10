@@ -16,7 +16,6 @@ const onTouched = (otherPart: BasePart, healthPickup: HealthPickupModel) => {
 
 export class HealthPickupsController {
 	static init() {
-		print("Initializing HealthPickupsController");
 		for (const healthPickup of HealthPickups.getAllHealthPickups()) {
 			healthPickup.init();
 			healthPickup.addTouchedEventListener(onTouched);
