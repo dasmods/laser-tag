@@ -1,6 +1,10 @@
 import { HealthPickupsConstants } from "server/health-pickups/HealthPickupsConstants";
 
-export type TouchedCallback = (otherPart: BasePart, healthPickup: HealthPickupModel) => void;
+type TouchedCallback = (otherPart: BasePart, healthPickup: HealthPickupModel) => void;
+
+type HealableEntity = {
+	Health: number;
+};
 
 export class HealthPickupModel {
 	private basePart: BasePart;
@@ -25,14 +29,14 @@ export class HealthPickupModel {
 		error(`unexpected attribute type for ${HealthPickupsConstants.ENABLED_ATTR}: ${typeOf(isEnabled)}`);
 	}
 
-	heal(humanoid: Humanoid) {
+	heal(entity: HealableEntity) {
 		if (!this.isEnabled()) {
 			return;
 		}
-		if (humanoid.Health === 100) {
+		if (entity.Health === 100) {
 			return;
 		}
-		humanoid.Health = math.min(100, humanoid.Health + HealthPickupsConstants.HEAL_AMOUNT);
+		entity.Health = math.min(100, entity.Health + HealthPickupsConstants.HEAL_AMOUNT);
 		this.cooldown();
 	}
 
