@@ -18,7 +18,7 @@ export class HealthPickupModel {
 		this.enable();
 	}
 
-	addTouchedEventListener(callback: TouchedCallback) {
+	onTouched(callback: TouchedCallback) {
 		this.basePart.Touched.Connect((otherPart) => callback(otherPart, this));
 	}
 

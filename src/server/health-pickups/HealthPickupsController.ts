@@ -18,7 +18,7 @@ export class HealthPickupsController {
 	static init() {
 		for (const healthPickup of HealthPickups.getAllHealthPickups()) {
 			healthPickup.init();
-			healthPickup.addTouchedEventListener(onTouched);
+			healthPickup.onTouched(onTouched);
 		}
 	}
 

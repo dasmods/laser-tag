@@ -9,15 +9,15 @@ export class BlasterModel {
 
 	init() {}
 
-	addActivatedEventListener(callback: Callback) {
+	onActivated(callback: Callback) {
 		this.tool.Activated.Connect(() => callback(this));
 	}
 
-	addEquippedEventListner(callback: Callback) {
+	onEquipped(callback: Callback) {
 		this.tool.Equipped.Connect(() => callback(this));
 	}
 
-	addUnequippedEventListener(callback: Callback) {
+	onUnequipped(callback: Callback) {
 		this.tool.Unequipped.Connect(() => callback(this));
 	}
 

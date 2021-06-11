@@ -18,8 +18,8 @@ const onActivated = (blaster: BlasterModel) => {
 export class BlasterController {
 	static init() {
 		const blaster = getBlaster();
-		blaster.addEquippedEventListner(onEquipped);
-		blaster.addActivatedEventListener(onActivated);
-		blaster.addUnequippedEventListener(onUnequipped);
+		blaster.onEquipped(onEquipped);
+		blaster.onActivated(onActivated);
+		blaster.onUnequipped(onUnequipped);
 	}
 }
