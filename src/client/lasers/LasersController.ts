@@ -1,4 +1,4 @@
-import { LaserFiredLocalEvent } from "client/Events/LaserFiredLocal/LaserFiredLocalEvent";
+import { LaserFiredLocalEvent } from "shared/Events/LaserFiredLocal/LaserFiredLocalEvent";
 import { LaserFiredRemoteEvent } from "shared/Events/LaserFiredRemote/LaserFiredRemoteEvent";
 import { ClientController } from "shared/util/controllers";
 

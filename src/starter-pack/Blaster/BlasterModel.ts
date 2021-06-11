@@ -1,3 +1,4 @@
+import { LaserFiredLocalEvent } from "shared/Events/LaserFiredLocal/LaserFiredLocalEvent";
 import { LaserFiredRemoteEvent } from "shared/Events/LaserFiredRemote/LaserFiredRemoteEvent";
 import { Model } from "shared/util/models";
 
@@ -32,6 +33,7 @@ export class BlasterModel extends Model {
 	}
 
 	fire(position: Vector3) {
+		LaserFiredLocalEvent.dispatchToSelf();
 		LaserFiredRemoteEvent.dispatchToServer();
 	}
 
