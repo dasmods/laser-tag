@@ -18,10 +18,8 @@ const onActivated = (blaster: BlasterModel) => {
 export class BlasterController {
 	static init() {
 		const blaster = getBlaster();
-		blaster.tool.Equipped.Connect(() => onEquipped(blaster));
-		blaster.tool.Unequipped.Connect(() => onUnequipped(blaster));
-		blaster.tool.Activated.Connect(() => onActivated(blaster));
+		blaster.addEquippedEventListner(onEquipped);
+		blaster.addActivatedEventListener(onActivated);
+		blaster.addUnequippedEventListener(onUnequipped);
 	}
 }
-
-BlasterController.init();
