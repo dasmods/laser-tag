@@ -1,4 +1,4 @@
-import { ContextActionService } from "@rbxts/services";
+import { ContextActionService, Players } from "@rbxts/services";
 import { BlasterConstants } from "starter-pack/Blaster/BlasterConstants";
 import { BlasterModel } from "starter-pack/Blaster/BlasterModel";
 import { getBlaster } from "starter-pack/Blaster/Blasters";
@@ -12,7 +12,8 @@ const onUnequipped = (blaster: BlasterModel) => {
 };
 
 const onActivated = (blaster: BlasterModel) => {
-	blaster.fire();
+	const position = blaster.getPosition();
+	blaster.fire(position);
 };
 
 export class BlasterController {

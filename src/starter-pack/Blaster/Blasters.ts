@@ -8,6 +8,10 @@ const isTool = (value: unknown): value is Tool => {
 
 export const getBlaster = () => {
 	const tool = script.Parent;
-	assert(isTool(tool));
-	return new BlasterModel(tool);
+	assert(t.instanceIsA("Tool")(tool));
+
+	const handle = tool.FindFirstChild("Handle");
+	assert(t.instanceIsA("MeshPart")(handle));
+
+	return new BlasterModel(tool, handle);
 };
