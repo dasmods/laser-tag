@@ -1,6 +1,7 @@
-export class LasersController {
-	static init() {
+import { ClientController } from "shared/util/controllers";
+
+export class LasersController extends ClientController {
+	init() {
 		print("init client LasersController");
 	}
-	private constructor() {}
 }

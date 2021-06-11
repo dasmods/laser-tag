@@ -1,3 +1,3 @@
 import { LasersController } from "client/lasers/LasersController";
 
-LasersController.init();
+new LasersController().init();
