@@ -32,9 +32,9 @@ export class BlasterModel extends Model {
 		print("reloading!");
 	}
 
-	fire(position: Vector3) {
-		LaserFiredLocalEvent.dispatchToSelf();
-		LaserFiredRemoteEvent.dispatchToServer();
+	fire(cframe: CFrame) {
+		LaserFiredLocalEvent.dispatchToSelf(cframe);
+		LaserFiredRemoteEvent.dispatchToServer(cframe);
 	}
 
 	getPosition() {

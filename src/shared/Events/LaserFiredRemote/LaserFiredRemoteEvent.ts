@@ -1,7 +1,7 @@
 import { t } from "@rbxts/t";
 
-export type LaserFiredClientCallback = () => void;
-export type LaserFiredServerCallback = (player: Player) => void;
+export type LaserFiredClientCallback = (firedByPlayer: Player, cframe: CFrame) => void;
+export type LaserFiredServerCallback = (player: Player, cframe: CFrame) => void;
 
 const getRemoteEvent = (): RemoteEvent => {
 	const remoteEvent = script.Parent;
@@ -10,16 +10,19 @@ const getRemoteEvent = (): RemoteEvent => {
 };
 
 export class LaserFiredRemoteEvent {
-	static dispatchToServer() {
-		getRemoteEvent().FireServer();
+	static dispatchToServer(cframe: CFrame) {
+		getRemoteEvent().FireServer(cframe);
 	}
 
-	static dispatchToAllClients() {
-		getRemoteEvent().FireAllClients();
+	static dispatchToAllClients(firedByPlayer: Player, cframe: CFrame) {
+		getRemoteEvent().FireAllClients(firedByPlayer, cframe);
 	}
 
 	static onServerEvent(callback: LaserFiredServerCallback) {
-		getRemoteEvent().OnServerEvent.Connect(callback);
+		getRemoteEvent().OnServerEvent.Connect((player: Player, cframe: unknown) => {
+			assert(t.CFrame(cframe));
+			callback(player, cframe);
+		});
 	}
 
 	static onClientEvent(callback: LaserFiredClientCallback) {

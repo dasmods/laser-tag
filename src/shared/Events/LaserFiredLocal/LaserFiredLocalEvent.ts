@@ -1,6 +1,6 @@
 import { t } from "@rbxts/t";
 
-export type LaserFiredLocalCallback = () => void;
+export type LaserFiredLocalCallback = (cframe: CFrame) => void;
 
 const getEvent = (): BindableEvent => {
 	const event = script.Parent;
@@ -13,7 +13,7 @@ export class LaserFiredLocalEvent {
 		getEvent().Event.Connect(callback);
 	}
 
-	static dispatchToSelf() {
-		getEvent().Fire();
+	static dispatchToSelf(cframe: CFrame) {
+		getEvent().Fire(cframe);
 	}
 }

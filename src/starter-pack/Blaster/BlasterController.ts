@@ -13,7 +13,8 @@ const onUnequipped = (blaster: BlasterModel) => {
 
 const onActivated = (blaster: BlasterModel) => {
 	const position = blaster.getPosition();
-	blaster.fire(position);
+	const cframe = new CFrame(position);
+	blaster.fire(cframe);
 };
 
 export class BlasterController {
