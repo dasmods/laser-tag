@@ -1,8 +1,8 @@
-import { LaserFired } from "shared/Events/LaserFired/LaserFired";
+import { LaserFiredEvent } from "shared/Events/LaserFired/LaserFiredEvent";
 
 export class LaserController {
 	static init() {
-		LaserFired.onServerEvent((player: Player) => {
+		LaserFiredEvent.onServerEvent((player: Player) => {
 			print(`laser fired by ${player.Name}!`);
 		});
 	}
