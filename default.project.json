@@ -24,6 +24,10 @@
 				"$path": "out/shared"
 			}
 		},
+		"StarterPack": {
+			"$className": "StarterPack",
+			"$path": "out/starter-pack"
+		},
 		"StarterPlayer": {
 			"$className": "StarterPlayer",
 			"StarterPlayerScripts": {
