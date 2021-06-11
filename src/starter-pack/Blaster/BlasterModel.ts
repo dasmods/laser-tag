@@ -1,3 +1,5 @@
+import { LaserFired } from "shared/Events/LaserFired/LaserFired";
+
 type Callback = (blaster: BlasterModel) => void;
 
 export class BlasterModel {
@@ -26,6 +28,6 @@ export class BlasterModel {
 	}
 
 	fire() {
-		print("firing!");
+		LaserFired.fireServer();
 	}
 }

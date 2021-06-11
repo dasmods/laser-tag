@@ -10,6 +10,14 @@ const getRemoteEvent = (): RemoteEvent => {
 };
 
 export class LaserFired {
+	static fireServer() {
+		getRemoteEvent().FireServer();
+	}
+
+	static fireAllClients() {
+		getRemoteEvent().FireAllClients();
+	}
+
 	static onServerEvent(callback: LaserFiredServerCallback) {
 		getRemoteEvent().OnServerEvent.Connect(callback);
 	}
