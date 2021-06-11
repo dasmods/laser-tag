@@ -9,7 +9,7 @@ const getRemoteEvent = (): RemoteEvent => {
 	return remoteEvent;
 };
 
-export class LaserFiredEvent {
+export class LaserFiredRemoteEvent {
 	static dispatchToServer() {
 		getRemoteEvent().FireServer();
 	}

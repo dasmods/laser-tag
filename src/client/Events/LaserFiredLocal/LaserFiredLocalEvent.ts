@@ -1,6 +1,6 @@
 import { t } from "@rbxts/t";
 
-export type LaserFiredCallback = () => void;
+export type LaserFiredLocalCallback = () => void;
 
 const getEvent = (): BindableEvent => {
 	const event = script.Parent;
@@ -8,8 +8,8 @@ const getEvent = (): BindableEvent => {
 	return event;
 };
 
-export class LaserFiredEvent {
-	static onClientEvent(callback: LaserFiredCallback) {
+export class LaserFiredLocalEvent {
+	static onClientEvent(callback: LaserFiredLocalCallback) {
 		getEvent().Event.Connect(callback);
 	}
 

@@ -1,5 +1,4 @@
-import { LaserFiredEvent as LaserFiredRemoteEvent } from "shared/Events/LaserFired/LaserFiredEvent";
-import { LaserFiredEvent as LaserFiredLocalEvent } from "client/Events/LaserFired/LaserFiredEvent";
+import { LaserFiredRemoteEvent } from "shared/Events/LaserFiredRemote/LaserFiredRemoteEvent";
 import { Model } from "shared/util/models";
 
 type Callback = (blaster: BlasterModel) => void;
@@ -33,7 +32,6 @@ export class BlasterModel extends Model {
 	}
 
 	fire(position: Vector3) {
-		LaserFiredLocalEvent.dispatchToSelf();
 		LaserFiredRemoteEvent.dispatchToServer();
 	}
 
