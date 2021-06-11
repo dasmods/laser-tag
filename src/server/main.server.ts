@@ -1,5 +1,5 @@
 import { HealthPickupsController } from "server/health-pickups/HealthPickupsController";
-import { LaserController } from "server/lasers/LaserController";
+import { LasersController } from "server/lasers/LasersController";
 
 HealthPickupsController.init();
-LaserController.init();
+LasersController.init();
