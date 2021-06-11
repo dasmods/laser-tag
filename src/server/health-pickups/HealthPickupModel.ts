@@ -1,5 +1,6 @@
 import { t } from "@rbxts/t";
 import { HealthPickupsConstants } from "server/health-pickups/HealthPickupsConstants";
+import { Model } from "shared/util/models";
 
 type TouchedCallback = (otherPart: BasePart, healthPickup: HealthPickupModel) => void;
 
@@ -7,10 +8,11 @@ type HealableEntity = {
 	Health: number;
 };
 
-export class HealthPickupModel {
+export class HealthPickupModel extends Model {
 	private basePart: BasePart;
 
 	constructor(basePart: BasePart) {
+		super();
 		this.basePart = basePart;
 	}
 

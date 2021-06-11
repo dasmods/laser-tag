@@ -1,11 +1,13 @@
 import { LaserFiredEvent } from "shared/Events/LaserFired/LaserFiredEvent";
+import { Model } from "shared/util/models";
 
 type Callback = (blaster: BlasterModel) => void;
 
-export class BlasterModel {
+export class BlasterModel extends Model {
 	private tool: Tool;
 
 	constructor(tool: Tool) {
+		super();
 		this.tool = tool;
 	}
 
