@@ -1,6 +1,7 @@
 {
   "className": "Tool",
   "properties": {
-    "GripPos": [0, -0.4, 0.8]
+    "GripPos": [0, -0.4, 0.8],
+    "TextureId": "rbxassetid://92628145"
   }
 }
