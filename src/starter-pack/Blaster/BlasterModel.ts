@@ -1,7 +1,7 @@
 type Callback = (blaster: BlasterModel) => void;
 
 export class BlasterModel {
-	tool: Tool;
+	private tool: Tool;
 
 	constructor(tool: Tool) {
 		this.tool = tool;
