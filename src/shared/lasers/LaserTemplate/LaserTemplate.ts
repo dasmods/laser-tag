@@ -8,6 +8,8 @@ const getTemplatePart = (): Part => {
 
 export class LaserTemplate {
 	static clone(): Part {
-		return getTemplatePart().Clone();
+		const laser = getTemplatePart().Clone();
+		laser.Name = "Laser";
+		return laser;
 	}
 }
