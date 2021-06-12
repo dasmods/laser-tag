@@ -7,16 +7,17 @@ import { ClientController } from "shared/util/controllers";
 const LASER_FIRED_INTERNAL = new LaserFiredInternal();
 const LASER_FIRED_EXTERNAL = new LaserFiredExternal();
 
-const onLaserFiredInternal = (initialVelocity: CFrame) => {
-	const laser = LaserModel.create(initialVelocity);
+const onLaserFiredInternal = (initialCFrame: CFrame) => {
+	const laser = LaserModel.create(initialCFrame);
 	laser.render();
 };
 
-const onLaserFiredExternal = (firedByPlayer: Player, initialVelocity: CFrame) => {
+const onLaserFiredExternal = (firedByPlayer: Player, initialCFrame: CFrame) => {
 	if (firedByPlayer === Players.LocalPlayer) {
 		return;
 	}
-	print(`laser fired by ${firedByPlayer}`);
+	const laser = LaserModel.create(initialCFrame);
+	laser.render();
 };
 
 export class LasersController extends ClientController {

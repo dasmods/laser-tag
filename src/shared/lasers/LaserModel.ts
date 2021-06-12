@@ -4,12 +4,12 @@ import { Model } from "shared/util/models";
 import { LASER_SPEED_STUDS_PER_SEC } from "shared/lasers/LasersConstants";
 
 export class LaserModel extends Model {
-	static create(initialVelocity: CFrame): LaserModel {
+	static create(initialCFrame: CFrame): LaserModel {
 		const part = LaserTemplate.clone();
-		part.CFrame = initialVelocity;
+		part.CFrame = initialCFrame;
 
 		const bodyVelocity = new Instance("BodyVelocity");
-		bodyVelocity.Velocity = initialVelocity.LookVector.mul(LASER_SPEED_STUDS_PER_SEC);
+		bodyVelocity.Velocity = initialCFrame.LookVector.mul(LASER_SPEED_STUDS_PER_SEC);
 		bodyVelocity.Parent = part;
 
 		return new LaserModel(part);

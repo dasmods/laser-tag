@@ -3,13 +3,13 @@ import { ServerController } from "shared/util/controllers";
 
 const LASER_FIRED_EXTERNAL = new LaserFiredExternal();
 
-const validateLaserFired = (player: Player, initialVelocity: CFrame) => {};
+const validateLaserFired = (player: Player, initialCFrame: CFrame) => {};
 
 export class LasersController extends ServerController {
 	init() {
-		LASER_FIRED_EXTERNAL.onServerEvent((player: Player, initialVelocity: CFrame) => {
-			validateLaserFired(player, initialVelocity);
-			LASER_FIRED_EXTERNAL.dispatchToAllClients(player, initialVelocity);
+		LASER_FIRED_EXTERNAL.onServerEvent((player: Player, initialCFrame: CFrame) => {
+			validateLaserFired(player, initialCFrame);
+			LASER_FIRED_EXTERNAL.dispatchToAllClients(player, initialCFrame);
 		});
 	}
 }
