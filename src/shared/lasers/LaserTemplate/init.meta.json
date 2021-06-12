@@ -2,8 +2,6 @@
   "className": "Part",
   "properties": {
     "Name": "LaserTemplate",
-    "Massless": true,
-    "Size": [0.2, 0.2, 5],
     "Anchored": false,
     "CanCollide": true,
     "Color": [0.8, 1, 0],

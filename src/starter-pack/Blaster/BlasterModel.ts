@@ -1,5 +1,6 @@
 import { LaserFiredExternal } from "shared/Events/LaserFiredExternal/LaserFiredExternal";
 import { LaserFiredInternal } from "shared/Events/LaserFiredInternal/LaserFiredInternal";
+import { LASER_SIZE_Z_STUDS, LASER_Y_OFFSET_STUDS, LASER_Z_OFFSET_STUDS } from "shared/lasers/LasersConstants";
 import { Model } from "shared/util/models";
 
 type Callback = (blaster: BlasterModel) => void;
@@ -36,12 +37,16 @@ export class BlasterModel extends Model {
 	}
 
 	fire() {
-		const initialCFrame = this.calculateBulletinitialCFrame();
+		const initialCFrame = this.calculateBulletInitialCFrame();
 		LASER_FIRED_INTERNAL.dispatch(initialCFrame);
 		LASER_FIRED_EXTERNAL.dispatchToServer(initialCFrame);
 	}
 
-	private calculateBulletinitialCFrame(): CFrame {
-		return this.handle.CFrame;
+	private calculateBulletInitialCFrame(): CFrame {
+		const cFrame = this.handle.CFrame;
+		const offsetMagnitudeZ = -(LASER_SIZE_Z_STUDS / 2) - LASER_Z_OFFSET_STUDS;
+		const offsetMagnitudeY = LASER_Y_OFFSET_STUDS;
+		const offsetCFrame = new CFrame(0, offsetMagnitudeY, offsetMagnitudeZ);
+		return cFrame.ToWorldSpace(offsetCFrame);
 	}
 }

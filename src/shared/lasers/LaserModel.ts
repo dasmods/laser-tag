@@ -4,7 +4,7 @@ import { Model } from "shared/util/models";
 import { LASER_SPEED_STUDS_PER_SEC } from "shared/lasers/LasersConstants";
 
 export class LaserModel extends Model {
-	static create(initialCFrame: CFrame): LaserModel {
+	static create(firedByPlayer: Player, initialCFrame: CFrame): LaserModel {
 		const part = LaserTemplate.clone();
 		part.CFrame = initialCFrame;
 
@@ -12,13 +12,15 @@ export class LaserModel extends Model {
 		bodyVelocity.Velocity = initialCFrame.LookVector.mul(LASER_SPEED_STUDS_PER_SEC);
 		bodyVelocity.Parent = part;
 
-		return new LaserModel(part);
+		return new LaserModel(firedByPlayer, part);
 	}
 
+	private firedByPlayer: Player;
 	private part: Part;
 
-	private constructor(part: Part) {
+	private constructor(firedByPlayer: Player, part: Part) {
 		super();
+		this.firedByPlayer = firedByPlayer;
 		this.part = part;
 	}
 
