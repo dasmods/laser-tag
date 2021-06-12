@@ -27,7 +27,16 @@ export class LaserModel extends Model {
 	init() {}
 
 	render() {
+		this.part.Touched.Connect((otherPart: BasePart) => this.onTouched(otherPart));
 		this.part.Parent = Workspace;
 		Debris.AddItem(this.part);
+	}
+
+	private onTouched(otherPart: BasePart) {
+		if (!otherPart.CanCollide) {
+			return;
+		}
+
+		this.part.Destroy();
 	}
 }
