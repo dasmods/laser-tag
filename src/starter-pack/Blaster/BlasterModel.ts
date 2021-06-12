@@ -35,12 +35,13 @@ export class BlasterModel extends Model {
 		print("reloading!");
 	}
 
-	fire(cframe: CFrame) {
-		LASER_FIRED_INTERNAL.dispatch(cframe);
-		LASER_FIRED_EXTERNAL.dispatchToServer(cframe);
+	fire() {
+		const initialVelocity = this.calculateBulletInitialVelocity();
+		LASER_FIRED_INTERNAL.dispatch(initialVelocity);
+		LASER_FIRED_EXTERNAL.dispatchToServer(initialVelocity);
 	}
 
-	getPosition() {
-		return this.handle.Position;
+	private calculateBulletInitialVelocity(): CFrame {
+		return this.handle.CFrame;
 	}
 }
