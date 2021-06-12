@@ -1,8 +1,11 @@
-import { LaserFiredLocalEvent } from "shared/Events/LaserFiredLocal/LaserFiredLocalEvent";
-import { LaserFiredClientToServerEvent } from "shared/Events/LaserFiredRemote/LaserFiredRemote";
+import { LaserFiredExternal } from "shared/Events/LaserFiredExternal/LaserFiredExternal";
+import { LaserFiredInternal } from "shared/Events/LaserFiredInternal/LaserFiredInternal";
 import { Model } from "shared/util/models";
 
 type Callback = (blaster: BlasterModel) => void;
+
+const LASER_FIRED_INTERNAL = new LaserFiredInternal();
+const LASER_FIRED_EXTERNAL = new LaserFiredExternal();
 
 export class BlasterModel extends Model {
 	private tool: Tool;
@@ -33,8 +36,8 @@ export class BlasterModel extends Model {
 	}
 
 	fire(cframe: CFrame) {
-		LaserFiredLocalEvent.dispatchToSelf(cframe);
-		new LaserFiredClientToServerEvent().dispatchToServer(cframe);
+		LASER_FIRED_INTERNAL.dispatch(cframe);
+		LASER_FIRED_EXTERNAL.dispatchToServer(cframe);
 	}
 
 	getPosition() {

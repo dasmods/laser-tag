@@ -1,55 +1,47 @@
 type EventCallback<T extends unknown[]> = (...args: T) => void;
-type ClientToServerEventCallback<T extends unknown[]> = (player: Player, ...args: T) => void;
+type RemoteEventCallback<T extends unknown[]> = (player: Player, ...args: T) => void;
 
 abstract class Event<E extends BindableEvent | RemoteEvent> {
 	abstract getEvent(): E;
 }
 
-export abstract class ClientToClientEvent<T extends unknown[]> extends Event<BindableEvent> {
-	dispatchToClient(...args: T) {
+export abstract class InternalEvent<Args extends unknown[]> extends Event<BindableEvent> {
+	dispatch(...args: Args) {
 		this.getEvent().Fire(...args);
 	}
 
-	onClientEvent(callback: EventCallback<T>) {
+	onEvent(callback: EventCallback<Args>) {
 		this.getEvent().Event.Connect(callback);
 	}
 }
 
-export abstract class ServerToServerEvent<T extends unknown[]> extends Event<BindableEvent> {
-	dispatchToServer(...args: T) {
-		this.getEvent().Fire(...args);
-	}
+/**
+ * SArgs are arguments from client to server arguments.
+ * CArgs are arguments from server to client arguments.
+ */
+export abstract class ExternalEvent<SArgs extends unknown[], CArgs extends unknown[]> extends Event<RemoteEvent> {
+	abstract typeCheckArgs(args: unknown[]): args is SArgs;
 
-	onServerEvent(callback: EventCallback<T>) {
-		this.getEvent().Event.Connect(callback);
-	}
-}
-
-export abstract class ClientToServerEvent<T extends unknown[]> extends Event<RemoteEvent> {
-	abstract typeCheckArgs(args: unknown[]): args is T;
-
-	dispatchToServer(...args: T) {
-		this.getEvent().FireServer(...args);
-	}
-
-	onServerEvent(callback: ClientToServerEventCallback<T>) {
+	onServerEvent(callback: RemoteEventCallback<SArgs>) {
 		this.getEvent().OnServerEvent.Connect((player: Player, ...args: unknown[]) => {
 			assert(this.typeCheckArgs(args));
 			callback(player, ...args);
 		});
 	}
-}
 
-export abstract class ServerToClientsEvent<T extends unknown[]> extends Event<RemoteEvent> {
-	dispatchToAllClients(...args: T) {
-		this.getEvent().FireAllClients(...args);
+	onClientEvent(callback: EventCallback<CArgs>) {
+		this.getEvent().OnClientEvent.Connect(callback);
 	}
 
-	dispatchToClient(player: Player, ...args: T) {
+	dispatchToServer(...args: SArgs) {
+		this.getEvent().FireServer(...args);
+	}
+
+	dispatchToClient(player: Player, ...args: SArgs) {
 		this.getEvent().FireClient(player, ...args);
 	}
 
-	onClientEvent(callback: EventCallback<T>) {
-		this.getEvent().OnClientEvent.Connect(callback);
+	dispatchToAllClients(...args: CArgs) {
+		this.getEvent().FireAllClients(...args);
 	}
 }
