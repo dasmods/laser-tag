@@ -2,7 +2,7 @@ import { t } from "@rbxts/t";
 import { ExternalEvent } from "shared/util/events";
 
 type LaserFiredSArgs = [cframe: CFrame];
-type LaserFiredCArgs = [player: Player, cframe: CFrame];
+type LaserFiredCArgs = [firedByPlayer: Player, cframe: CFrame];
 
 export class LaserFiredExternal extends ExternalEvent<LaserFiredSArgs, LaserFiredCArgs> {
 	getEvent() {
