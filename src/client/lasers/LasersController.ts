@@ -1,5 +1,4 @@
-import { LaserFiredLocalEvent } from "shared/Events/LaserFiredLocal/LaserFiredLocalEvent";
-import { LaserFiredRemoteEvent } from "shared/Events/LaserFiredRemote/LaserFiredRemoteEvent";
+import { LaserFiredServerToClientEvent } from "shared/Events/LaserFiredRemote/LaserFiredRemote";
 import { ClientController } from "shared/util/controllers";
 
 const onLaserFired = () => {
@@ -8,7 +7,6 @@ const onLaserFired = () => {
 
 export class LasersController extends ClientController {
 	init() {
-		LaserFiredLocalEvent.onClientEvent(onLaserFired);
-		LaserFiredRemoteEvent.onClientEvent(onLaserFired);
+		LaserFiredServerToClientEvent;
 	}
 }

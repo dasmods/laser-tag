@@ -10,7 +10,7 @@ export abstract class ClientToClientEvent<T extends unknown[]> extends Event<Bin
 		this.getEvent().Fire(...args);
 	}
 
-	onEvent(callback: EventCallback<T>) {
+	onClientEvent(callback: EventCallback<T>) {
 		this.getEvent().Event.Connect(callback);
 	}
 }
@@ -20,7 +20,7 @@ export abstract class ServerToServerEvent<T extends unknown[]> extends Event<Bin
 		this.getEvent().Fire(...args);
 	}
 
-	onEvent(callback: EventCallback<T>) {
+	onServerEvent(callback: EventCallback<T>) {
 		this.getEvent().Event.Connect(callback);
 	}
 }
@@ -32,7 +32,7 @@ export abstract class ClientToServerEvent<T extends unknown[]> extends Event<Rem
 		this.getEvent().FireServer(...args);
 	}
 
-	onEvent(callback: ClientToServerEventCallback<T>) {
+	onServerEvent(callback: ClientToServerEventCallback<T>) {
 		this.getEvent().OnServerEvent.Connect((player: Player, ...args: unknown[]) => {
 			assert(this.typeCheckArgs(args));
 			callback(player, ...args);
@@ -49,7 +49,7 @@ export abstract class ServerToClientsEvent<T extends unknown[]> extends Event<Re
 		this.getEvent().FireClient(player, ...args);
 	}
 
-	onEvent(callback: EventCallback<T>) {
+	onClientEvent(callback: EventCallback<T>) {
 		this.getEvent().OnClientEvent.Connect(callback);
 	}
 }

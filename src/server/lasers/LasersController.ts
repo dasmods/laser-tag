@@ -1,11 +1,14 @@
-import { LaserFiredRemoteEvent } from "shared/Events/LaserFiredRemote/LaserFiredRemoteEvent";
+import {
+	LaserFiredClientToServerEvent,
+	LaserFiredServerToClientEvent,
+} from "shared/Events/LaserFiredRemote/LaserFiredRemote";
 import { ServerController } from "shared/util/controllers";
 
 export class LasersController extends ServerController {
 	init() {
-		LaserFiredRemoteEvent.onServerEvent((player: Player, cframe: CFrame) => {
+		new LaserFiredClientToServerEvent().onServerEvent((player: Player, cframe: CFrame) => {
 			print(`laser fired by ${player.Name}!`);
-			LaserFiredRemoteEvent.dispatchToAllClients(player, cframe);
+			new LaserFiredServerToClientEvent().dispatchToAllClients(player, cframe);
 		});
 	}
 }
