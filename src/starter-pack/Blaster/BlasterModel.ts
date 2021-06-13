@@ -37,12 +37,13 @@ export class BlasterModel extends Model {
 	}
 
 	fire() {
-		const initialCFrame = this.calculateBulletInitialCFrame();
-		LASER_FIRED_INTERNAL.dispatch(initialCFrame);
-		LASER_FIRED_EXTERNAL.dispatchToServer(initialCFrame);
+		const firedAt = tick();
+		const firedFrom = this.calculateFiredFrom();
+		LASER_FIRED_INTERNAL.dispatch(firedFrom);
+		LASER_FIRED_EXTERNAL.dispatchToServer(firedAt, firedFrom);
 	}
 
-	private calculateBulletInitialCFrame(): CFrame {
+	private calculateFiredFrom(): CFrame {
 		const cFrame = this.handle.CFrame;
 		const offsetMagnitudeZ = -(LASER_SIZE_Z_STUDS / 2) - LASER_Z_OFFSET_STUDS;
 		const offsetMagnitudeY = LASER_Y_OFFSET_STUDS;

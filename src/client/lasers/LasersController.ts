@@ -8,16 +8,16 @@ const LASER_FIRED_INTERNAL = new LaserFiredInternal();
 const LASER_FIRED_EXTERNAL = new LaserFiredExternal();
 const LOCAL_PLAYER = Players.LocalPlayer;
 
-const onLaserFiredInternal = (initialCFrame: CFrame) => {
-	const laser = LaserModel.create(LOCAL_PLAYER, initialCFrame);
+const onLaserFiredInternal = (firedFrom: CFrame) => {
+	const laser = LaserModel.create(LOCAL_PLAYER, firedFrom);
 	laser.render();
 };
 
-const onLaserFiredExternal = (firedByPlayer: Player, initialCFrame: CFrame) => {
-	if (firedByPlayer === LOCAL_PLAYER) {
+const onLaserFiredExternal = (firedBy: Player, firedAt: number, firedFrom: CFrame) => {
+	if (firedBy === LOCAL_PLAYER) {
 		return;
 	}
-	const laser = LaserModel.create(LOCAL_PLAYER, initialCFrame);
+	const laser = LaserModel.create(LOCAL_PLAYER, firedFrom);
 	laser.render();
 };
 

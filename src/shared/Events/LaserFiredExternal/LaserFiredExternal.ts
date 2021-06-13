@@ -1,8 +1,8 @@
 import { t } from "@rbxts/t";
 import { ExternalEvent } from "shared/util/events";
 
-type LaserFiredSArgs = [initialCFrame: CFrame];
-type LaserFiredCArgs = [firedByPlayer: Player, initialCFrame: CFrame];
+type LaserFiredSArgs = [firedAt: number, firedFrom: CFrame];
+type LaserFiredCArgs = [firedBy: Player, firedAt: number, firedFrom: CFrame];
 
 export class LaserFiredExternal extends ExternalEvent<LaserFiredSArgs, LaserFiredCArgs> {
 	getEvent() {
@@ -12,8 +12,9 @@ export class LaserFiredExternal extends ExternalEvent<LaserFiredSArgs, LaserFire
 	}
 
 	typeCheckArgs(args: unknown[]): args is LaserFiredSArgs {
-		assert(args.size() === 1);
-		assert(t.CFrame(args[0]));
+		assert(args.size() === 2);
+		assert(t.number(args[0])); // firedAt
+		assert(t.CFrame(args[1])); // firedFrom
 		return true;
 	}
 }

@@ -5,8 +5,8 @@ const LASER_FIRED_EXTERNAL = new LaserFiredExternal();
 
 export class LasersController extends ServerController {
 	init() {
-		LASER_FIRED_EXTERNAL.onServerEvent((firedByPlayer: Player, initialCFrame: CFrame) => {
-			LASER_FIRED_EXTERNAL.dispatchToAllClients(firedByPlayer, initialCFrame);
+		LASER_FIRED_EXTERNAL.onServerEvent((firedBy: Player, firedAt: number, firedFrom: CFrame) => {
+			LASER_FIRED_EXTERNAL.dispatchToAllClients(firedBy, firedAt, firedFrom);
 		});
 	}
 }
