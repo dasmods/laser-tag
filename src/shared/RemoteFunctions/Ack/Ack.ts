@@ -1,3 +1,4 @@
+import { RunService } from "@rbxts/services";
 import { t } from "@rbxts/t";
 
 const getRemoteFunction = (): RemoteFunction => {
@@ -8,7 +9,9 @@ const getRemoteFunction = (): RemoteFunction => {
 
 export class AckRemoteFunction {
 	init() {
-		getRemoteFunction().OnServerInvoke = () => true;
+		if (RunService.IsServer()) {
+			getRemoteFunction().OnServerInvoke = () => true;
+		}
 	}
 
 	invokeServer(): boolean {
