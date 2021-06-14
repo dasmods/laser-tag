@@ -42,7 +42,6 @@ export class LaserTracker {
 	}
 
 	untrack(laserId: string) {
-		print(this.store);
 		this.store[laserId] = undefined;
 	}
 

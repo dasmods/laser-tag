@@ -1,6 +1,7 @@
 import { RunService } from "@rbxts/services";
 import { t } from "@rbxts/t";
 import { Ack } from "shared/RemoteFunctions/Ack/Ack";
+import { RUNNING_AVG_SIZE } from "shared/time/TimeConstants";
 import { CircularArray } from "shared/util/CircularArray";
 import { avg } from "shared/util/math";
 
@@ -8,7 +9,7 @@ const ACK = new Ack();
 const IS_SERVER = RunService.IsServer();
 
 export class TimeService {
-	static cache: TimeService | undefined;
+	private static cache: TimeService | undefined;
 
 	static getInstance(): TimeService {
 		if (t.nil(TimeService.cache)) {
@@ -17,8 +18,8 @@ export class TimeService {
 		return TimeService.cache;
 	}
 
-	private pingsSec: CircularArray<number> = new CircularArray(100);
-	private offsetsSec: CircularArray<number> = new CircularArray(100);
+	private pingsSec: CircularArray<number> = new CircularArray(RUNNING_AVG_SIZE);
+	private offsetsSec: CircularArray<number> = new CircularArray(RUNNING_AVG_SIZE);
 
 	private constructor() {}
 
@@ -41,9 +42,9 @@ export class TimeService {
 		const clientTimeSec2 = tick();
 
 		const pingSec = clientTimeSec2 - clientTimeSec1;
-		const offsetSec = clientTimeSec1 - serverTimeSec;
-
 		this.pingsSec.push(pingSec);
+
+		const offsetSec = clientTimeSec1 - serverTimeSec;
 		this.offsetsSec.push(offsetSec);
 	}
 

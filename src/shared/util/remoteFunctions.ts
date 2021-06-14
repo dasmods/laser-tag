@@ -20,7 +20,7 @@ export abstract class ServerFunction<Args extends unknown[], T> extends External
 	}
 
 	invokeServer(...args: Args): T {
-		return this.getRemoteFunction().InvokeServer(args);
+		return this.getRemoteFunction().InvokeServer(...args);
 	}
 }
 export abstract class ClientFunction<Args extends unknown[], T> extends ExternallyRunFunction {
