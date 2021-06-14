@@ -19,11 +19,13 @@ export abstract class ServerFunction<Args extends unknown[], T> extends External
 		};
 	}
 
-	invokeServer(...args: Args) {
-		this.getRemoteFunction().InvokeServer(args);
+	invokeServer(...args: Args): T {
+		return this.getRemoteFunction().InvokeServer(args);
 	}
 }
 export abstract class ClientFunction<Args extends unknown[], T> extends ExternallyRunFunction {
+	abstract typeCheckReturn(ret: unknown): ret is T;
+
 	abstract onClientInvoke(...args: Args): T;
 
 	initClient() {
@@ -35,7 +37,9 @@ export abstract class ClientFunction<Args extends unknown[], T> extends External
 		};
 	}
 
-	invokeClient(player: Player, ...args: Args) {
-		this.getRemoteFunction().InvokeClient(player, ...args);
+	invokeClient(player: Player, ...args: Args): T {
+		const ret = this.getRemoteFunction().InvokeClient(player, ...args);
+		assert(this.typeCheckReturn(ret));
+		return ret;
 	}
 }
