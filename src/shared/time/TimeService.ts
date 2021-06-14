@@ -11,20 +11,20 @@ export class TimeService {
 		return TimeService.cache;
 	}
 
-	private pingsMs: CircularArray<number> = new CircularArray(60);
+	private pingsSec: CircularArray<number> = new CircularArray(60);
 
 	private constructor() {}
 
-	registerPingMs(pingMs: number) {
-		this.pingsMs.push(pingMs);
+	registerPingSec(pingSec: number) {
+		this.pingsSec.push(pingSec);
 	}
 
-	getRunningAveragePingMs(): number {
-		const numPings = this.pingsMs.getLength();
+	getRunningAveragePingSec(): number {
+		const numPings = this.pingsSec.getLength();
 		if (numPings === 0) {
 			return 0;
 		}
-		const totalPing = this.pingsMs.getValues().reduce((totalPing, ping) => totalPing + ping, 0);
+		const totalPing = this.pingsSec.getValues().reduce((totalPing, ping) => totalPing + ping, 0);
 		return totalPing / numPings;
 	}
 }

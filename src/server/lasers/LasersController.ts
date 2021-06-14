@@ -25,15 +25,15 @@ const getHumanoid = (parts: BasePart[]) => {
 
 export class LasersController extends ServerController {
 	init() {
-		LASER_FIRED_EXTERNAL.onServerEvent((firedBy: Player, laserId: string, pingMs: number, firedFrom: CFrame) => {
+		LASER_FIRED_EXTERNAL.onServerEvent((firedBy: Player, laserId: string, pingSec: number, firedFrom: CFrame) => {
 			// A ping represents a total roundtrip: client-server-client
 			// Therefore, we only need half of the roundtrip. Assume that
 			// the time it takes for a client to reach the server is the
 			// amount of time the laser was fired ago.
-			const firedAtSecAgo = pingMs / 1000 / 2;
-			const firedAt = tick() - firedAtSecAgo;
+			const firedAtSecAgoFromServerPOV = pingSec / 2;
+			const firedAt = tick() - firedAtSecAgoFromServerPOV;
 			LASER_TRACKER.track(laserId, { firedAt, firedBy, firedFrom });
-			LASER_FIRED_EXTERNAL.dispatchToAllClients(laserId, firedBy, firedAtSecAgo, firedFrom);
+			LASER_FIRED_EXTERNAL.dispatchToAllClients(laserId, firedBy, firedAtSecAgoFromServerPOV, firedFrom);
 		});
 
 		LASER_HIT_EXTERNAL.onServerEvent((reportedBy: Player, laserId: string) => {

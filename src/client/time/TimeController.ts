@@ -10,8 +10,8 @@ const onHeartbeat = () => {
 	const t1 = tick();
 	ACK_SERVER_FUNCTION.invokeServer();
 	const t2 = tick();
-	const pingMs = (t2 - t1) * 1000;
-	TIME_SERVICE.registerPingMs(pingMs);
+	const pingSec = t2 - t1;
+	TIME_SERVICE.registerPingSec(pingSec);
 };
 
 export class TimeController extends ClientController {

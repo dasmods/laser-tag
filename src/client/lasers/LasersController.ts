@@ -12,9 +12,7 @@ const LOCAL_PLAYER = Players.LocalPlayer;
 const TIME_SERVICE = TimeService.getInstance();
 
 const approximateLaserCurrentCFrame = (firedAtSecAgo: number, firedFrom: CFrame): CFrame => {
-	const halfPingRoundTripSec = TIME_SERVICE.getRunningAveragePingMs() / 1000 / 5;
-	const timeFiredAgoSec = firedAtSecAgo + halfPingRoundTripSec;
-	const offsetDistance = LASER_SPEED_STUDS_PER_SEC * timeFiredAgoSec;
+	const offsetDistance = LASER_SPEED_STUDS_PER_SEC * firedAtSecAgo;
 	return firedFrom.ToWorldSpace(new CFrame(0, 0, -offsetDistance));
 };
 
@@ -22,16 +20,23 @@ const onLaserFiredInternal = (firedFrom: CFrame) => {
 	const laser = LaserModel.create(LOCAL_PLAYER, firedFrom);
 	laser.setColor(LASER_FRIENDLY_COLOR);
 
-	const pingMs = TIME_SERVICE.getRunningAveragePingMs();
-	LASER_FIRED_EXTERNAL.dispatchToServer(laser.getLaserId(), pingMs, firedFrom);
+	const pingSec = TIME_SERVICE.getRunningAveragePingSec();
+	LASER_FIRED_EXTERNAL.dispatchToServer(laser.getLaserId(), pingSec, firedFrom);
 
 	laser.render();
 };
 
-const onLaserFiredExternal = (laserId: string, firedBy: Player, firedAtSecAgo: number, firedFrom: CFrame) => {
+const onLaserFiredExternal = (
+	laserId: string,
+	firedBy: Player,
+	firedAtSecAgoFromServerPOV: number,
+	firedFrom: CFrame,
+) => {
 	if (firedBy === LOCAL_PLAYER) {
 		return;
 	}
+	const timeToReceiveEventSec = TIME_SERVICE.getRunningAveragePingSec() / 2;
+	const firedAtSecAgo = firedAtSecAgoFromServerPOV + timeToReceiveEventSec;
 	const currentLaserCFrame = approximateLaserCurrentCFrame(firedAtSecAgo, firedFrom);
 	const laser = LaserModel.createWithId(laserId, LOCAL_PLAYER, currentLaserCFrame);
 	laser.setColor(LASER_ENEMY_COLOR);
