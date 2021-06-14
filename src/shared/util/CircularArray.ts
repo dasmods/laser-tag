@@ -1,31 +1,25 @@
 export class CircularArray<T> {
-	private ndx = 0;
-	private size: number;
-	private actualArray: T[] = [];
+	public readonly capacity: number;
 
-	constructor(size: number) {
-		assert(size > 0);
-		this.size = size;
-		this.actualArray = [];
+	private ndx = 0;
+	private values: T[];
+
+	constructor(capacity: number) {
+		assert(capacity > 0);
+		this.capacity = capacity;
+		this.values = new Array<T>(capacity);
 	}
 
 	push(value: T) {
-		if (this.isAtEndOfActualArray()) {
-			this.ndx = 0;
-		}
-		this.actualArray[this.ndx] = value;
-		this.ndx++;
+		this.values[this.ndx] = value;
+		this.ndx = (this.ndx + 1) % this.capacity;
 	}
 
 	getValues(): T[] {
-		return [...this.actualArray];
+		return [...this.values];
 	}
 
 	getLength(): number {
-		return this.actualArray.size();
-	}
-
-	private isAtEndOfActualArray(): boolean {
-		return this.ndx === this.size - 1;
+		return this.values.size();
 	}
 }
