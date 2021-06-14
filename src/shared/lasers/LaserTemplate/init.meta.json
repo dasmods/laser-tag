@@ -4,7 +4,6 @@
     "Name": "LaserTemplate",
     "Anchored": false,
     "CanCollide": true,
-    "Color": [0.8, 1, 0],
     "Material": "Neon"
   }
 }

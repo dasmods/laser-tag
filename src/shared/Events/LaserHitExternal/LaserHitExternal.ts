@@ -1,7 +1,7 @@
 import { t } from "@rbxts/t";
 import { ExternalEvent } from "shared/util/events";
 
-type LaserHitSArgs = [hitModel: Model];
+type LaserHitSArgs = [laserId: string];
 type LaserHitCArgs = [];
 
 export class LaserHitExternal extends ExternalEvent<LaserHitSArgs, LaserHitCArgs> {
@@ -13,7 +13,9 @@ export class LaserHitExternal extends ExternalEvent<LaserHitSArgs, LaserHitCArgs
 
 	typeCheckArgs(args: unknown[]): args is LaserHitSArgs {
 		assert(args.size() === 1);
-		assert(t.instanceIsA("Model")(args[0]));
+		assert(t.string(args[0]));
+		// TODO(jared) Ensure that the laserId is a UUID, since it originates
+		// from the client.
 		return true;
 	}
 }

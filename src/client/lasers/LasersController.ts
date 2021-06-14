@@ -21,15 +21,19 @@ const approximateLaserCurrentCFrame = (firedAtSecAgo: number, firedFrom: CFrame)
 const onLaserFiredInternal = (firedFrom: CFrame) => {
 	const laser = LaserModel.create(LOCAL_PLAYER, firedFrom);
 	laser.setColor(LASER_FRIENDLY_COLOR);
+
+	const pingMs = TIME_SERVICE.getRunningAveragePingMs();
+	LASER_FIRED_EXTERNAL.dispatchToServer(laser.getLaserId(), pingMs, firedFrom);
+
 	laser.render();
 };
 
-const onLaserFiredExternal = (firedBy: Player, firedAtSecAgo: number, firedFrom: CFrame) => {
+const onLaserFiredExternal = (laserId: string, firedBy: Player, firedAtSecAgo: number, firedFrom: CFrame) => {
 	if (firedBy === LOCAL_PLAYER) {
 		return;
 	}
 	const currentLaserCFrame = approximateLaserCurrentCFrame(firedAtSecAgo, firedFrom);
-	const laser = LaserModel.create(LOCAL_PLAYER, currentLaserCFrame);
+	const laser = LaserModel.createWithId(laserId, LOCAL_PLAYER, currentLaserCFrame);
 	laser.setColor(LASER_ENEMY_COLOR);
 	laser.render();
 };

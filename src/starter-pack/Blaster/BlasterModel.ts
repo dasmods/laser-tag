@@ -41,10 +41,8 @@ export class BlasterModel extends Model {
 	}
 
 	fire() {
-		const pingMs = TIME_SERVICE.getRunningAveragePingMs();
 		const firedFrom = this.calculateFiredFrom();
 		LASER_FIRED_INTERNAL.dispatch(firedFrom);
-		LASER_FIRED_EXTERNAL.dispatchToServer(pingMs, firedFrom);
 	}
 
 	private calculateFiredFrom(): CFrame {
