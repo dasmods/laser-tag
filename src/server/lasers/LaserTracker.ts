@@ -24,7 +24,7 @@ export class LaserTracker {
 		}
 		const now = tick();
 		const laserHitBox = this.calculateLaserHitboxRegion(now, trackEvent);
-		return laserHitBox.Cast();
+		return laserHitBox.Cast(trackEvent.firedBy.Character);
 	}
 
 	track(laserId: string, trackEvent: LaserTrackEvent) {

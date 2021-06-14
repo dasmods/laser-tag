@@ -1,9 +1,8 @@
-import { Debris, HttpService, Players, Workspace } from "@rbxts/services";
+import { Debris, HttpService, Workspace } from "@rbxts/services";
 import { LaserTemplate } from "shared/lasers/LaserTemplate/LaserTemplate";
 import { Model } from "shared/util/models";
 import { LASER_LIFETIME_SEC, LASER_SPEED_STUDS_PER_SEC } from "shared/lasers/LasersConstants";
 import { LaserHitExternal } from "shared/Events/LaserHitExternal/LaserHitExternal";
-import { t } from "@rbxts/t";
 
 const LASER_HIT_EXTERNAL = new LaserHitExternal();
 export class LaserModel extends Model {
@@ -54,9 +53,7 @@ export class LaserModel extends Model {
 		if (!otherPart.CanCollide) {
 			return;
 		}
-
 		LASER_HIT_EXTERNAL.dispatchToServer(this.laserId);
-
 		this.part.Destroy();
 	}
 }
