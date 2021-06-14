@@ -35,8 +35,10 @@ const onLaserFiredExternal = (
 	if (firedBy === LOCAL_PLAYER) {
 		return;
 	}
-	const timeToReceiveEventSec = TIME_SERVICE.getRunningAveragePingSec() / 2;
-	const firedAtSecAgo = firedAtSecAgoFromServerPOV + timeToReceiveEventSec;
+	// The time to receieve an event is approximately half the time it takes for
+	// a full roundtrip ping.
+	const timeToReceiveEventFromServerSec = TIME_SERVICE.getRunningAveragePingSec() / 2;
+	const firedAtSecAgo = firedAtSecAgoFromServerPOV + timeToReceiveEventFromServerSec;
 	const currentLaserCFrame = approximateLaserCurrentCFrame(firedAtSecAgo, firedFrom);
 	const laser = LaserModel.createWithId(laserId, LOCAL_PLAYER, currentLaserCFrame);
 	laser.setColor(LASER_ENEMY_COLOR);
