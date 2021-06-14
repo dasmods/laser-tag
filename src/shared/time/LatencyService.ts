@@ -1,14 +1,14 @@
 import { t } from "@rbxts/t";
 import { CircularArray } from "shared/util/CircularArray";
 
-export class TimeService {
-	static cache: TimeService | undefined;
+export class LatencyService {
+	static cache: LatencyService | undefined;
 
-	static getInstance(): TimeService {
-		if (t.nil(TimeService.cache)) {
-			TimeService.cache = new TimeService();
+	static getInstance(): LatencyService {
+		if (t.nil(LatencyService.cache)) {
+			LatencyService.cache = new LatencyService();
 		}
-		return TimeService.cache;
+		return LatencyService.cache;
 	}
 
 	private pingsSec: CircularArray<number> = new CircularArray(60);
