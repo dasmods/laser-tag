@@ -6,3 +6,4 @@ export const LASER_Y_OFFSET_STUDS = 0.2;
 export const LASER_Z_OFFSET_STUDS = 2;
 export const LASER_FRIENDLY_COLOR = new Color3(0, 1, 0);
 export const LASER_ENEMY_COLOR = new Color3(1, 0, 0);
+export const LASER_DAMAGE = 10;

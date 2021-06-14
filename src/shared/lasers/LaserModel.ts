@@ -2,7 +2,10 @@ import { Debris, Workspace } from "@rbxts/services";
 import { LaserTemplate } from "shared/lasers/LaserTemplate/LaserTemplate";
 import { Model } from "shared/util/models";
 import { LASER_SPEED_STUDS_PER_SEC } from "shared/lasers/LasersConstants";
+import { LaserHitExternal } from "shared/Events/LaserHitExternal/LaserHitExternal";
+import { t } from "@rbxts/t";
 
+const LASER_HIT_EXTERNAL = new LaserHitExternal();
 export class LaserModel extends Model {
 	static create(firedByPlayer: Player, initialCFrame: CFrame): LaserModel {
 		const part = LaserTemplate.clone();
@@ -29,7 +32,7 @@ export class LaserModel extends Model {
 	render() {
 		this.part.Touched.Connect((otherPart: BasePart) => this.onTouched(otherPart));
 		this.part.Parent = Workspace;
-		// Debris.AddItem(this.part, 10);
+		Debris.AddItem(this.part, 10);
 	}
 
 	setColor(color: Color3) {
@@ -37,10 +40,19 @@ export class LaserModel extends Model {
 	}
 
 	private onTouched(otherPart: BasePart) {
-		if (!otherPart.CanCollide) {
-			return;
+		// if (!otherPart.CanCollide) {
+		// 	return;
+		// }
+		print(otherPart);
+		const model = this.getModel(otherPart);
+		if (t.instanceIsA("Model")(model)) {
+			LASER_HIT_EXTERNAL.dispatchToServer(model);
 		}
 
 		this.part.Destroy();
+	}
+
+	private getModel(part: BasePart) {
+		return part.Parent;
 	}
 }

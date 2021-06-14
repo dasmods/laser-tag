@@ -1,5 +1,4 @@
 import { t } from "@rbxts/t";
-import { MAX_PING_MS } from "shared/time/TimeConstants";
 import { CircularArray } from "shared/util/CircularArray";
 
 export class TimeService {
@@ -23,10 +22,9 @@ export class TimeService {
 	getRunningAveragePingMs(): number {
 		const numPings = this.pingsMs.getLength();
 		if (numPings === 0) {
-			return MAX_PING_MS;
+			return 0;
 		}
 		const totalPing = this.pingsMs.getValues().reduce((totalPing, ping) => totalPing + ping, 0);
-		const avgPing = totalPing / numPings;
-		return math.min(MAX_PING_MS, avgPing);
+		return totalPing / numPings;
 	}
 }
