@@ -1,14 +1,14 @@
 import { TimeModel } from "client/time/TimeModel";
 import { LatencyService } from "shared/time/LatencyService";
-import { AckServerFunction } from "shared/RemoteFunctions/AckServerFunction/AckServerFunction";
+import { Ack } from "shared/RemoteFunctions/Ack/Ack";
 import { ClientController } from "shared/util/controllers";
 
-const ACK_SERVER_FUNCTION = new AckServerFunction();
+const ACK = new Ack();
 const LATENCY_SERVICE = LatencyService.getInstance();
 
 const onHeartbeat = () => {
 	const t1 = tick();
-	ACK_SERVER_FUNCTION.invokeServer();
+	ACK.invokeServer();
 	const t2 = tick();
 	const pingSec = t2 - t1;
 	LATENCY_SERVICE.registerPingSec(pingSec);

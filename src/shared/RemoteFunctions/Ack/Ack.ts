@@ -4,7 +4,7 @@ import { ServerFunction } from "shared/util/remoteFunctions";
 type AckArgs = [];
 type AckReturn = number;
 
-export class AckServerFunction extends ServerFunction<AckArgs, AckReturn> {
+export class Ack extends ServerFunction<AckArgs, AckReturn> {
 	getRemoteFunction() {
 		const remoteFunction = script.Parent;
 		assert(t.instanceIsA("RemoteFunction")(remoteFunction));
