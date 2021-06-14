@@ -1,5 +1,5 @@
 import { TimeModel } from "client/time/TimeModel";
-import { TimeService } from "client/time/TimeService";
+import { TimeService } from "shared/time/TimeService";
 import { AckRemoteFunction } from "shared/RemoteFunctions/Ack/Ack";
 import { ClientController } from "shared/util/controllers";
 

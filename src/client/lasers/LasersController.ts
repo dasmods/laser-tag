@@ -1,4 +1,5 @@
 import { Players } from "@rbxts/services";
+import { TimeService } from "shared/time/TimeService";
 import { LaserFiredExternal } from "shared/Events/LaserFiredExternal/LaserFiredExternal";
 import { LaserFiredInternal } from "shared/Events/LaserFiredInternal/LaserFiredInternal";
 import { LaserModel } from "shared/lasers/LaserModel";
@@ -8,9 +9,11 @@ import { ClientController } from "shared/util/controllers";
 const LASER_FIRED_INTERNAL = new LaserFiredInternal();
 const LASER_FIRED_EXTERNAL = new LaserFiredExternal();
 const LOCAL_PLAYER = Players.LocalPlayer;
+const TIME_SERVICE = TimeService.getInstance();
 
-const approximateLaserCurrentCFrame = (firedAt: number, firedFrom: CFrame): CFrame => {
-	const timeFiredAgoSec = tick() - firedAt;
+const approximateLaserCurrentCFrame = (firedAtSecAgo: number, firedFrom: CFrame): CFrame => {
+	const halfPingRoundTripSec = TIME_SERVICE.getRunningAveragePingMs() / 1000 / 5;
+	const timeFiredAgoSec = firedAtSecAgo + halfPingRoundTripSec;
 	const offsetDistance = LASER_SPEED_STUDS_PER_SEC * timeFiredAgoSec;
 	return firedFrom.ToWorldSpace(new CFrame(0, 0, -offsetDistance));
 };
@@ -21,11 +24,11 @@ const onLaserFiredInternal = (firedFrom: CFrame) => {
 	laser.render();
 };
 
-const onLaserFiredExternal = (firedBy: Player, firedAt: number, firedFrom: CFrame) => {
+const onLaserFiredExternal = (firedBy: Player, firedAtSecAgo: number, firedFrom: CFrame) => {
 	if (firedBy === LOCAL_PLAYER) {
 		return;
 	}
-	const currentLaserCFrame = approximateLaserCurrentCFrame(firedAt, firedFrom);
+	const currentLaserCFrame = approximateLaserCurrentCFrame(firedAtSecAgo, firedFrom);
 	const laser = LaserModel.create(LOCAL_PLAYER, currentLaserCFrame);
 	laser.setColor(LASER_ENEMY_COLOR);
 	laser.render();

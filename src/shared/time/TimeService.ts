@@ -1,5 +1,5 @@
 import { t } from "@rbxts/t";
-import { MAX_PING_MS } from "client/time/TimeConstants";
+import { MAX_PING_MS } from "shared/time/TimeConstants";
 import { CircularArray } from "shared/util/CircularArray";
 
 export class TimeService {
@@ -13,6 +13,8 @@ export class TimeService {
 	}
 
 	private pingsMs: CircularArray<number> = new CircularArray(60);
+
+	private constructor() {}
 
 	registerPingMs(pingMs: number) {
 		this.pingsMs.push(pingMs);

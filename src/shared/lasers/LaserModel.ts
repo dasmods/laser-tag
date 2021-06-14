@@ -29,7 +29,7 @@ export class LaserModel extends Model {
 	render() {
 		this.part.Touched.Connect((otherPart: BasePart) => this.onTouched(otherPart));
 		this.part.Parent = Workspace;
-		Debris.AddItem(this.part, 10);
+		// Debris.AddItem(this.part, 10);
 	}
 
 	setColor(color: Color3) {

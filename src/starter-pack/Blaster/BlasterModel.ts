@@ -1,3 +1,4 @@
+import { TimeService } from "shared/time/TimeService";
 import { LaserFiredExternal } from "shared/Events/LaserFiredExternal/LaserFiredExternal";
 import { LaserFiredInternal } from "shared/Events/LaserFiredInternal/LaserFiredInternal";
 import { LASER_SIZE_Z_STUDS, LASER_Y_OFFSET_STUDS, LASER_Z_OFFSET_STUDS } from "shared/lasers/LasersConstants";
@@ -7,6 +8,8 @@ type Callback = (blaster: BlasterModel) => void;
 
 const LASER_FIRED_INTERNAL = new LaserFiredInternal();
 const LASER_FIRED_EXTERNAL = new LaserFiredExternal();
+
+const TIME_SERVICE = TimeService.getInstance();
 
 export class BlasterModel extends Model {
 	private tool: Tool;
@@ -37,10 +40,10 @@ export class BlasterModel extends Model {
 	}
 
 	fire() {
-		const firedAt = tick();
+		const pingMs = TIME_SERVICE.getRunningAveragePingMs();
 		const firedFrom = this.calculateFiredFrom();
 		LASER_FIRED_INTERNAL.dispatch(firedFrom);
-		LASER_FIRED_EXTERNAL.dispatchToServer(firedAt, firedFrom);
+		LASER_FIRED_EXTERNAL.dispatchToServer(pingMs, firedFrom);
 	}
 
 	private calculateFiredFrom(): CFrame {

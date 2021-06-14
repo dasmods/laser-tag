@@ -1,4 +1,4 @@
-export const LASER_SPEED_STUDS_PER_SEC = 5;
+export const LASER_SPEED_STUDS_PER_SEC = 100;
 export const LASER_SIZE_X_STUDS = 0.2;
 export const LASER_SIZE_Y_STUDS = 0.2;
 export const LASER_SIZE_Z_STUDS = 5;

@@ -5,9 +5,13 @@ const LASER_FIRED_EXTERNAL = new LaserFiredExternal();
 
 export class LasersController extends ServerController {
 	init() {
-		LASER_FIRED_EXTERNAL.onServerEvent((firedBy: Player, firedAt: number, firedFrom: CFrame) => {
-			wait(5);
-			LASER_FIRED_EXTERNAL.dispatchToAllClients(firedBy, firedAt, firedFrom);
+		LASER_FIRED_EXTERNAL.onServerEvent((firedBy: Player, pingMs: number, firedFrom: CFrame) => {
+			// A ping represents a total roundtrip: client-server-client
+			// Therefore, we only need half of the roundtrip.
+			const halfPingRoundTripSec = pingMs / 1000 / 2;
+			const firedAt = tick() - halfPingRoundTripSec;
+			const firedAtSecAgo = tick() - firedAt;
+			LASER_FIRED_EXTERNAL.dispatchToAllClients(firedBy, firedAtSecAgo, firedFrom);
 		});
 	}
 }
