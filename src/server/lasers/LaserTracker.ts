@@ -66,12 +66,12 @@ export class LaserTracker {
 		const approximateHitCFrame = trackEvent.firedFrom.ToWorldSpace(offsetCFrame);
 
 		// TODO(jared) Remove this when done testing.
-		this.renderPart(approximateHitCFrame, laserHitBoxSize);
+		this.renderHitbox(approximateHitCFrame, laserHitBoxSize);
 
 		return Block(approximateHitCFrame, laserHitBoxSize);
 	}
 
-	private renderPart(cFrame: CFrame, size: Vector3) {
+	private renderHitbox(cFrame: CFrame, size: Vector3) {
 		const part = new Instance("Part");
 		part.Anchored = true;
 		part.CanCollide = false;
