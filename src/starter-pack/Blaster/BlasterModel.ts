@@ -3,12 +3,13 @@ import { LaserFiredExternal } from "shared/Events/LaserFiredExternal/LaserFiredE
 import { LaserFiredInternal } from "shared/Events/LaserFiredInternal/LaserFiredInternal";
 import { LASER_SIZE_Z_STUDS, LASER_Y_OFFSET_STUDS, LASER_Z_OFFSET_STUDS } from "shared/lasers/LasersConstants";
 import { Model } from "shared/util/models";
+import { Players } from "@rbxts/services";
 
 type Callback = (blaster: BlasterModel) => void;
 
 const LASER_FIRED_INTERNAL = new LaserFiredInternal();
 const LASER_FIRED_EXTERNAL = new LaserFiredExternal();
-
+const LOCAL_PLAYER = Players.LocalPlayer;
 const TIME_SERVICE = TimeService.getInstance();
 
 export class BlasterModel extends Model {
@@ -47,7 +48,7 @@ export class BlasterModel extends Model {
 	}
 
 	private calculateFiredFrom(): CFrame {
-		const cFrame = this.handle.CFrame;
+		const cFrame = LOCAL_PLAYER.GetMouse().Origin;
 		const offsetMagnitudeZ = -(LASER_SIZE_Z_STUDS / 2) - LASER_Z_OFFSET_STUDS;
 		const offsetMagnitudeY = LASER_Y_OFFSET_STUDS;
 		const offsetCFrame = new CFrame(0, offsetMagnitudeY, offsetMagnitudeZ);
