@@ -2,7 +2,7 @@ import { t } from "@rbxts/t";
 import { ServerFunction } from "shared/util/remoteFunctions";
 
 type AckArgs = [];
-type AckReturn = boolean;
+type AckReturn = number;
 
 export class AckServerFunction extends ServerFunction<AckArgs, AckReturn> {
 	getRemoteFunction() {
@@ -17,6 +17,6 @@ export class AckServerFunction extends ServerFunction<AckArgs, AckReturn> {
 	}
 
 	onServerInvoke(player: Player) {
-		return true;
+		return tick();
 	}
 }
