@@ -42,6 +42,7 @@ export class LaserTracker {
 	}
 
 	untrack(laserId: string) {
+		print(this.store);
 		this.store[laserId] = undefined;
 	}
 
@@ -64,6 +65,7 @@ export class LaserTracker {
 		const offsetCFrame = new CFrame(0, 0, -distanceTraveledStuds);
 		const approximateHitCFrame = trackEvent.firedFrom.ToWorldSpace(offsetCFrame);
 
+		// TODO(jared) Remove this when done testing.
 		this.renderPart(approximateHitCFrame, laserHitBoxSize);
 
 		return Block(approximateHitCFrame, laserHitBoxSize);
