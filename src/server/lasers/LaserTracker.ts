@@ -8,11 +8,14 @@ import {
 	LASER_SIZE_Z_STUDS,
 	LASER_SPEED_STUDS_PER_SEC,
 } from "shared/lasers/LasersConstants";
+import { TimeService } from "shared/time/TimeService";
 import { Block, RotatedRegion3 } from "shared/util/RotatedRegion3";
 
 export type LaserTrackEvent = { firedFrom: CFrame; firedBy: Player; firedAt: number };
 
 type LaserTrackerStore = { [laserId: string]: LaserTrackEvent | undefined };
+
+const TIME_SERVICE = TimeService.getInstance();
 
 export class LaserTracker {
 	private store: LaserTrackerStore = {};
@@ -22,7 +25,7 @@ export class LaserTracker {
 		if (t.nil(trackEvent)) {
 			return [];
 		}
-		const now = tick();
+		const now = TIME_SERVICE.now();
 		const laserHitBox = this.calculateLaserHitboxRegion(now, trackEvent);
 		return laserHitBox.Cast(trackEvent.firedBy.Character);
 	}
