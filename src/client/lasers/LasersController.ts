@@ -19,26 +19,15 @@ const approximateLaserCurrentCFrame = (firedAtSecAgo: number, firedFrom: CFrame)
 const onLaserFiredInternal = (firedFrom: CFrame) => {
 	const laser = LaserModel.create(LOCAL_PLAYER, firedFrom);
 	laser.setColor(LASER_FRIENDLY_COLOR);
-
-	const pingSec = TIME_SERVICE.getAvgPingSec();
-	LASER_FIRED_EXTERNAL.dispatchToServer(laser.getLaserId(), pingSec, firedFrom);
-
+	LASER_FIRED_EXTERNAL.dispatchToServer(laser.getLaserId(), TIME_SERVICE.now(), firedFrom);
 	laser.render();
 };
 
-const onLaserFiredExternal = (
-	laserId: string,
-	firedBy: Player,
-	firedAtSecAgoFromServerPOV: number,
-	firedFrom: CFrame,
-) => {
+const onLaserFiredExternal = (laserId: string, firedBy: Player, firedAt: number, firedFrom: CFrame) => {
 	if (firedBy === LOCAL_PLAYER) {
 		return;
 	}
-	// The time to receieve an event is approximately half the time it takes for
-	// a full roundtrip ping.
-	const timeToReceiveEventFromServerSec = TIME_SERVICE.getAvgPingSec() / 2;
-	const firedAtSecAgo = firedAtSecAgoFromServerPOV + timeToReceiveEventFromServerSec;
+	const firedAtSecAgo = TIME_SERVICE.now() - firedAt;
 	const currentLaserCFrame = approximateLaserCurrentCFrame(firedAtSecAgo, firedFrom);
 	const laser = LaserModel.createWithId(laserId, LOCAL_PLAYER, currentLaserCFrame);
 	laser.setColor(LASER_ENEMY_COLOR);

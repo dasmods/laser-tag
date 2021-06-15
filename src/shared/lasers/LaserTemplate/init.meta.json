@@ -3,7 +3,7 @@
   "properties": {
     "Name": "LaserTemplate",
     "Anchored": false,
-    "CanCollide": true,
+    "CanCollide": false,
     "Material": "Neon"
   }
 }

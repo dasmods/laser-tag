@@ -1,7 +1,7 @@
 import { t } from "@rbxts/t";
 import { InternalEvent } from "shared/util/events";
 
-type LaserFiredArgs = [initialCFrame: CFrame];
+type LaserFiredArgs = [firedFrom: CFrame];
 
 export class LaserFiredInternal extends InternalEvent<LaserFiredArgs> {
 	getEvent() {

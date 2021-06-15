@@ -27,9 +27,7 @@ export class TimeService {
 		if (IS_SERVER) {
 			return tick();
 		}
-		const pingSec = this.getAvgPingSec();
-		const offsetSec = this.getAvgOffsetSec();
-		return tick() - pingSec + offsetSec;
+		return tick() + this.getAvgOffsetSec();
 	}
 
 	sync() {
