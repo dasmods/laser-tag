@@ -5,13 +5,14 @@ import { LASER_LIFETIME_SEC, LASER_SPEED_STUDS_PER_SEC } from "shared/lasers/Las
 import { LaserHitExternal } from "shared/Events/LaserHitExternal/LaserHitExternal";
 
 const LASER_HIT_EXTERNAL = new LaserHitExternal();
+
 export class LaserModel extends Model {
-	static create(firedBy: Player, firedFrom: CFrame): LaserModel {
+	static create(firedFrom: CFrame): LaserModel {
 		const laserId = HttpService.GenerateGUID(false);
-		return LaserModel.createWithId(laserId, firedBy, firedFrom);
+		return LaserModel.createWithId(laserId, firedFrom);
 	}
 
-	static createWithId(laserId: string, firedBy: Player, firedFrom: CFrame) {
+	static createWithId(laserId: string, firedFrom: CFrame) {
 		const part = LaserTemplate.clone();
 		part.CFrame = firedFrom;
 
@@ -19,17 +20,15 @@ export class LaserModel extends Model {
 		bodyVelocity.Velocity = firedFrom.LookVector.mul(LASER_SPEED_STUDS_PER_SEC);
 		bodyVelocity.Parent = part;
 
-		return new LaserModel(laserId, firedBy, part);
+		return new LaserModel(laserId, part);
 	}
 
 	private laserId: string;
-	private firedBy: Player;
 	private part: Part;
 
-	private constructor(laserId: string, firedBy: Player, part: Part) {
+	private constructor(laserId: string, part: Part) {
 		super();
 		this.laserId = laserId;
-		this.firedBy = firedBy;
 		this.part = part;
 	}
 
