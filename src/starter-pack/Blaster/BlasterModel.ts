@@ -41,8 +41,6 @@ export class BlasterModel extends Model {
 		});
 	}
 
-	init() {}
-
 	onActivated(callback: Callback) {
 		this.tool.Activated.Connect(() => callback(this));
 	}

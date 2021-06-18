@@ -1,3 +1,1 @@
-export abstract class Model {
-	abstract init<T>(...args: T[]): void;
-}
+export abstract class Model {}
