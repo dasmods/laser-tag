@@ -62,30 +62,26 @@ export class FSM<S extends string, E extends Event> {
 		this.startProcessing();
 
 		const stateNode = this.getStateNode(this.state);
-		let transition: Transition<S, E> | undefined;
-		let nextStateNode: StateNode<S, E> | undefined;
-
-		// exit current state
-		switch (stateNode.type) {
-			case "sync":
-				transition = this.doExitSync(event, stateNode);
-				break;
-			case "async":
-				// Can't exit from an async stateNode, it happens automatically
-				// when the promise resolves or rejects.
-				break;
-			default:
-				error(`could not determine state node type: ${stateNode}`);
+		if (stateNode.type !== "sync") {
+			this.stopProcessing();
+			warn(`exepected state node, wanted 'sync', got '${stateNode.type}'`);
+			return;
 		}
 
-		// transition states
-		if (!t.nil(transition)) {
-			nextStateNode = this.doTransition(event, transition);
-		}
-		if (t.nil(nextStateNode)) {
+		const transition = this.getTransition(event, stateNode);
+		if (t.nil(transition)) {
 			this.stopProcessing();
 			return;
 		}
+
+		const nextState = this.getNextState(event, transition);
+		const nextStateNode = this.getStateNode(nextState);
+
+		// exit current state
+		this.doExitSync(event, stateNode);
+
+		// transition
+		this.doTransition(event, transition);
 
 		// enter next state
 		switch (nextStateNode.type) {
@@ -110,6 +106,11 @@ export class FSM<S extends string, E extends Event> {
 
 	private getStateNode(state: S): StateNode<S, E> {
 		return this.def.states[state];
+	}
+
+	private getTransition(event: E, stateNode: SyncActionStateNode<S, E>): Transition<S, E> | undefined {
+		const eventType: E["type"] = event.type;
+		return stateNode.transitions[eventType];
 	}
 
 	private getNextState(event: E, transition: Transition<S, E>): S {
@@ -148,6 +149,8 @@ export class FSM<S extends string, E extends Event> {
 
 		const nextState = this.getNextState(event, transition);
 		const nextStateNode = this.getStateNode(nextState);
+
+		this.state = nextState;
 
 		switch (nextStateNode.type) {
 			case "sync":

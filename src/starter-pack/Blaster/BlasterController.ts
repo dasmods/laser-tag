@@ -18,6 +18,7 @@ const onActivated = (blaster: BlasterModel) => {
 export class BlasterController {
 	static init() {
 		const blaster = getBlaster();
+		blaster.init();
 		blaster.onEquipped(onEquipped);
 		blaster.onActivated(onActivated);
 		blaster.onUnequipped(onUnequipped);

@@ -2,6 +2,7 @@ import { LaserFiredInternal } from "shared/Events/LaserFiredInternal/LaserFiredI
 import { LASER_SIZE_Z_STUDS, LASER_Y_OFFSET_STUDS, LASER_Z_OFFSET_STUDS } from "shared/lasers/LasersConstants";
 import { Model } from "shared/util/models";
 import { Players } from "@rbxts/services";
+import { BlasterFSM, createBlasterFSM } from "starter-pack/Blaster/BlasterFSM";
 
 type Callback = (blaster: BlasterModel) => void;
 
@@ -12,10 +13,29 @@ export class BlasterModel extends Model {
 	private tool: Tool;
 	private handle: MeshPart;
 
+	private ammo = 30;
+	private fsm: BlasterFSM;
+
 	constructor(tool: Tool, handle: MeshPart) {
 		super();
 		this.tool = tool;
 		this.handle = handle;
+
+		this.fsm = createBlasterFSM({
+			fire: async () => {
+				this.ammo--;
+				print(`fired! ammo left ${this.ammo}`);
+				await Promise.delay(1);
+				print("ready to fire!");
+			},
+			reload: async () => {
+				print("reloading!");
+				await Promise.delay(2);
+				print("done reloading!");
+				this.ammo = 30;
+			},
+			hasAmmo: () => this.ammo > 0,
+		});
 	}
 
 	init() {}
@@ -33,10 +53,12 @@ export class BlasterModel extends Model {
 	}
 
 	reload() {
-		print("reloading!");
+		this.fsm.dispatch({ type: "reload" });
 	}
 
 	fire() {
+		this.fsm.dispatch({ type: "fire" });
+
 		const firedFrom = this.calculateFiredFrom();
 		LASER_FIRED_INTERNAL.dispatch(firedFrom);
 	}
