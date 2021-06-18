@@ -56,7 +56,6 @@ export class FSM<S extends string, E extends Event> {
 
 	dispatch(event: E): void {
 		if (this.isProcessing) {
-			warn(`currently processing, ignored event: ${event}`);
 			return;
 		}
 		this.startProcessing();

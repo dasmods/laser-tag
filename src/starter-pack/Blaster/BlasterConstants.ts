@@ -1,6 +1,6 @@
-export class BlasterConstants {
-	static RELOAD_ACTION = "RELOAD_ACTION";
-	static MAX_MOUSE_DISTANCE_STUDS = 1000;
-	static MAX_LASER_DISTANCE_STUDS = 500;
-	static FIRE_RATE_HZ = 0.3;
-}
+export const FIRE_RATE_HZ = 0.3;
+export const MAX_AMMO = 10;
+export const RELOAD_TIME_SEC = 2;
+export const RELOADING_TOOL_TEXTURE = "rbxassetid://6593020923";
+export const DEFAULT_TOOL_TEXTURE = "rbxassetid://92628145";
+export const EMPTY_TOOL_TEXTURE = "rbxassetid://6198684081";

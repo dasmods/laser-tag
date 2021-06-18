@@ -9,6 +9,7 @@ export type BlasterFSM = FSM<BlasterStates, BlasterEvents>;
 export type BlasterFSMParams = {
 	fire: () => Promise<void>;
 	reload: () => Promise<void>;
+	onEmpty: () => void;
 	hasAmmo: () => boolean;
 };
 
@@ -37,6 +38,7 @@ export const createBlasterFSM = (params: BlasterFSMParams): BlasterFSM => {
 			},
 			empty: {
 				type: "sync",
+				enter: params.onEmpty,
 				transitions: {
 					reload: {
 						to: "reloading",
