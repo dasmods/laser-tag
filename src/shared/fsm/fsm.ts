@@ -6,21 +6,23 @@ export type SyncAction<E extends Event> = (event: E) => void;
 
 export type AsyncAction<E extends Event> = (event: E) => Promise<void>;
 
+export type ConditionalState<S extends string, E extends Event> = (event: E) => S;
+
 export type Transition<S extends string, E extends Event> = {
-	to: S;
-	actions: SyncAction<E>[];
+	to: S | ConditionalState<S, E>;
+	effect?: SyncAction<E>;
 };
 
 export type SyncActionStateNode<S extends string, E extends Event> = {
 	type: "sync";
-	enter?: SyncAction<E>[];
-	exit?: SyncAction<E>[];
+	enter?: SyncAction<E>;
+	exit?: SyncAction<E>;
 	transitions: Partial<Record<E["type"], Transition<S, E>>>;
 };
 
 export type AsyncActionStateNode<S extends string, E extends Event> = {
 	type: "async";
-	enter: AsyncAction<E>[];
+	enter: AsyncAction<E>;
 	transitions: Record<"resolve", Transition<S, E>> & Partial<Record<"reject", Transition<S, E>>>;
 };
 
@@ -41,6 +43,7 @@ export type StateMachineDefinition<S extends string, E extends Event> = {
 export class FSM<S extends string, E extends Event> {
 	private state: S;
 	private def: StateMachineDefinition<S, E>;
+	private isProcessing = false;
 
 	constructor(def: StateMachineDefinition<S, E>) {
 		this.state = def.initialState;
@@ -52,50 +55,88 @@ export class FSM<S extends string, E extends Event> {
 	}
 
 	dispatch(event: E): void {
-		const stateNode = this.getStateNode(this.state);
-		if (this.isSyncStateNode(stateNode)) {
-			this.handleSyncStateNode(event, stateNode);
-		} else if (this.isAsyncStateNode(stateNode)) {
-			this.handleAsyncStateNode(event, stateNode);
-		} else {
-			error(`could not determine state node type: ${stateNode}`);
+		if (this.isProcessing) {
+			warn(`currently processing, ignored event: ${event}`);
+			return;
 		}
-	}
+		this.startProcessing();
 
-	private handleSyncStateNode(event: E, stateNode: SyncActionStateNode<S, E>): void {
-		const eventType: E["type"] = event.type;
-		const transition = stateNode.transitions[eventType];
-		if (t.nil(transition)) {
+		const stateNode = this.getStateNode(this.state);
+		let transition: Transition<S, E> | undefined;
+		let nextStateNode: StateNode<S, E> | undefined;
+
+		// exit current state
+		switch (stateNode.type) {
+			case "sync":
+				transition = this.doExitSync(event, stateNode);
+				break;
+			case "async":
+				// Can't exit from an async stateNode, it happens automatically
+				// when the promise resolves or rejects.
+				break;
+			default:
+				error(`could not determine state node type: ${stateNode}`);
+		}
+
+		// transition states
+		if (!t.nil(transition)) {
+			nextStateNode = this.doTransition(event, transition);
+		}
+		if (t.nil(nextStateNode)) {
+			this.stopProcessing();
 			return;
 		}
 
-		const nextState = transition.to;
-		const nextStateNode = this.getStateNode(nextState);
-
-		for (const action of stateNode.exit || []) {
-			action(event);
-		}
-		for (const action of transition.actions) {
-			action(event);
-		}
-
-		this.state = nextState;
-
-		if (this.isSyncStateNode(nextStateNode)) {
-			for (const action of nextStateNode.enter || []) {
-				action(event);
-			}
-		} else if (this.isAsyncStateNode(nextStateNode)) {
-			this.handleAsyncStateNode(event, nextStateNode);
-		} else {
-			error(`could not determine state node type: ${nextStateNode}`);
+		// enter next state
+		switch (nextStateNode.type) {
+			case "sync":
+				this.doEnterSync(event, nextStateNode);
+				break;
+			case "async":
+				this.doEnterAsyncAndTransition(event, nextStateNode);
+				break;
+			default:
+				error(`could not determine state node type: ${stateNode}`);
 		}
 	}
 
-	private async handleAsyncStateNode(event: E, stateNode: AsyncActionStateNode<S, E>): Promise<void> {
+	private startProcessing() {
+		this.isProcessing = true;
+	}
+
+	private stopProcessing() {
+		this.isProcessing = false;
+	}
+
+	private getStateNode(state: S): StateNode<S, E> {
+		return this.def.states[state];
+	}
+
+	private getNextState(event: E, transition: Transition<S, E>): S {
+		const target = transition.to;
+		return this.isConditionalState(target) ? target(event) : target;
+	}
+
+	private isConditionalState(value: S | ConditionalState<S, E>): value is ConditionalState<S, E> {
+		return t.callback(value);
+	}
+
+	private doTransition(event: E, transition: Transition<S, E>): StateNode<S, E> {
+		transition.effect?.(event);
+		const nextState = this.getNextState(event, transition);
+		this.state = nextState;
+		return this.getStateNode(nextState);
+	}
+
+	private doEnterSync(event: E, stateNode: SyncActionStateNode<S, E>): void {
+		stateNode.enter?.(event);
+		this.stopProcessing();
+	}
+
+	private async doEnterAsyncAndTransition(event: E, stateNode: AsyncActionStateNode<S, E>): Promise<void> {
 		let transition: Transition<S, E> | undefined;
 		try {
-			await Promise.all(stateNode.enter.map((action) => action(event)));
+			await stateNode.enter(event);
 			transition = stateNode.transitions.resolve;
 		} catch (e) {
 			transition = stateNode.transitions.reject;
@@ -105,73 +146,27 @@ export class FSM<S extends string, E extends Event> {
 			return;
 		}
 
-		const nextState = transition.to;
+		const nextState = this.getNextState(event, transition);
 		const nextStateNode = this.getStateNode(nextState);
 
-		for (const action of transition.actions) {
-			action(event);
+		switch (nextStateNode.type) {
+			case "sync":
+				this.doEnterSync(event, nextStateNode);
+				break;
+			case "async":
+				await this.doEnterAsyncAndTransition(event, nextStateNode);
+				break;
+			default:
+				error(`could not determine state node type: ${stateNode}`);
 		}
+	}
 
-		this.state = nextState;
-
-		for (const action of nextStateNode.enter || []) {
-			action(event);
+	private doExitSync(event: E, stateNode: SyncActionStateNode<S, E>): Transition<S, E> | undefined {
+		const eventType: E["type"] = event.type;
+		const transition = stateNode.transitions[eventType];
+		if (t.nil(transition)) {
+			return;
 		}
-	}
-
-	private getStateNode(state: S): StateNode<S, E> {
-		return this.def.states[state];
-	}
-
-	private isSyncStateNode(stateNode: StateNode<S, E>): stateNode is SyncActionStateNode<S, E> {
-		return stateNode.type === "sync";
-	}
-
-	private isAsyncStateNode(stateNode: StateNode<S, E>): stateNode is AsyncActionStateNode<S, E> {
-		return stateNode.type === "async";
+		stateNode.exit?.(event);
 	}
 }
-
-// FSM EXAMPLE:
-// an on-off switch
-//
-// type ToggleStates = "off" | "on";
-//
-// type ToggleEvents = { type: "toggle" };
-//
-// const toggle = new FSM<ToggleStates, ToggleEvents>({
-// 	initialState: "off",
-// 	states: {
-// 		on: {
-// 			type: "sync",
-// 			enter: [
-// 				() => {
-// 					print("I am on!");
-// 				},
-// 			],
-// 			exit: [],
-// 			transitions: {
-// 				toggle: {
-// 					to: "off",
-// 					actions: [],
-// 				},
-// 			},
-// 		},
-// 		off: {
-// 			type: "async",
-// 			enter: [
-// 				async () => {
-// 					print("I am off!");
-// 					await Promise.delay(1);
-// 					print("ready to turn on again");
-// 				},
-// 			],
-// 			transitions: {
-// 				resolve: {
-// 					to: "on",
-// 					actions: [],
-// 				},
-// 			},
-// 		},
-// 	},
-// });
