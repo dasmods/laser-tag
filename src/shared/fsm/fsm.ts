@@ -6,10 +6,10 @@ export type SyncAction<E extends Event> = (event: E) => void;
 
 export type AsyncAction<E extends Event> = (event: E) => Promise<void>;
 
-export type ConditionalState<S extends string, E extends Event> = (event: E) => S;
+export type ComputedState<S extends string, E extends Event> = (event: E) => S;
 
 export type Transition<S extends string, E extends Event> = {
-	to: S | ConditionalState<S, E>;
+	to: S | ComputedState<S, E>;
 	effect?: SyncAction<E>;
 };
 
@@ -117,7 +117,7 @@ export class FSM<S extends string, E extends Event> {
 		return this.isConditionalState(target) ? target(event) : target;
 	}
 
-	private isConditionalState(value: S | ConditionalState<S, E>): value is ConditionalState<S, E> {
+	private isConditionalState(value: S | ComputedState<S, E>): value is ComputedState<S, E> {
 		return t.callback(value);
 	}
 
