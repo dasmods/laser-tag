@@ -3,8 +3,10 @@ import { LaserTemplate } from "shared/lasers/LaserTemplate/LaserTemplate";
 import { Model } from "shared/util/models";
 import { LASER_LIFETIME_SEC, LASER_SPEED_STUDS_PER_SEC } from "shared/lasers/LasersConstants";
 import { LaserHitExternal } from "shared/Events/LaserHitExternal/LaserHitExternal";
+import { LaserCollisionGroup } from "shared/lasers/LaserCollisionGroup";
 
 const LASER_HIT_EXTERNAL = new LaserHitExternal();
+const LASER_COLLISION_GROUP = LaserCollisionGroup.getInstance();
 
 export class LaserModel extends Model {
 	static create(firedFrom: CFrame): LaserModel {
@@ -15,6 +17,7 @@ export class LaserModel extends Model {
 	static createWithId(laserId: string, firedFrom: CFrame) {
 		const part = LaserTemplate.clone();
 		part.CFrame = firedFrom;
+		LASER_COLLISION_GROUP.add(part);
 
 		const bodyVelocity = new Instance("BodyVelocity");
 		bodyVelocity.Velocity = firedFrom.LookVector.mul(LASER_SPEED_STUDS_PER_SEC);
@@ -32,8 +35,6 @@ export class LaserModel extends Model {
 		this.part = part;
 	}
 
-	init() {}
-
 	render() {
 		this.part.Touched.Connect((otherPart: BasePart) => this.onTouched(otherPart));
 		this.part.Parent = Workspace;
@@ -49,7 +50,7 @@ export class LaserModel extends Model {
 	}
 
 	private onTouched(otherPart: BasePart) {
-		if (!otherPart.CanCollide) {
+		if (!this.part.CanCollideWith(otherPart)) {
 			return;
 		}
 		LASER_HIT_EXTERNAL.dispatchToServer(this.laserId);
