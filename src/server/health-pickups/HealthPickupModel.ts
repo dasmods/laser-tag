@@ -43,12 +43,12 @@ export class HealthPickupModel extends Model {
 
 	private enable() {
 		this.basePart.SetAttribute(HealthPickupsConstants.ENABLED_ATTR, true);
-		this.makeMoreVisible();
+		this.increaseVisibility();
 	}
 
 	private disable() {
 		this.basePart.SetAttribute(HealthPickupsConstants.ENABLED_ATTR, false);
-		this.makeLessVisible();
+		this.decreaseVisibility();
 	}
 
 	private cooldown() {
@@ -57,11 +57,11 @@ export class HealthPickupModel extends Model {
 		this.enable();
 	}
 
-	private makeLessVisible() {
+	private decreaseVisibility() {
 		this.basePart.Transparency = HealthPickupsConstants.LESS_VISIBLE_TRANSPARENCY;
 	}
 
-	private makeMoreVisible() {
+	private increaseVisibility() {
 		this.basePart.Transparency = HealthPickupsConstants.MORE_VISIBLE_TRANSPARENCY;
 	}
 }
