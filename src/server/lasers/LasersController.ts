@@ -1,48 +1,26 @@
-import { t } from "@rbxts/t";
-import { LaserTracker } from "server/lasers/LaserTracker";
 import { LaserFiredExternal } from "shared/Events/LaserFiredExternal/LaserFiredExternal";
-import { LaserHitExternal } from "shared/Events/LaserHitExternal/LaserHitExternal";
-import { LASER_DAMAGE } from "shared/lasers/LasersConstants";
+import { LaserModel } from "shared/lasers/LaserModel";
+import { LASER_SPEED_STUDS_PER_SEC } from "shared/lasers/LasersConstants";
+import { TimeService } from "shared/time/TimeService";
 import { ServerController } from "shared/util/controllers";
 
 const LASER_FIRED_EXTERNAL = new LaserFiredExternal();
-const LASER_HIT_EXTERNAL = new LaserHitExternal();
-const LASER_TRACKER = new LaserTracker();
+const TIME_SERVICE = TimeService.getInstance();
 
-const getHumanoid = (parts: BasePart[]) => {
-	let humanoid: Humanoid | undefined;
-	for (const part of parts) {
-		const parent = part.Parent;
-		const grandparent = parent?.Parent;
-
-		humanoid = parent?.FindFirstChildWhichIsA("Humanoid") || grandparent?.FindFirstChildWhichIsA("Humanoid");
-
-		if (!t.nil(humanoid)) {
-			return humanoid;
-		}
-	}
+const approximateLaserCurrentCFrame = (firedAtSecAgo: number, firedFrom: CFrame): CFrame => {
+	const offsetDistance = LASER_SPEED_STUDS_PER_SEC * firedAtSecAgo;
+	return firedFrom.ToWorldSpace(new CFrame(0, 0, -offsetDistance));
 };
 
 export class LasersController extends ServerController {
 	init() {
 		LASER_FIRED_EXTERNAL.onServerEvent((firedBy: Player, laserId: string, firedAt: number, firedFrom: CFrame) => {
-			LASER_TRACKER.track(laserId, { firedAt, firedBy, firedFrom });
+			const firedAtSecAgo = TIME_SERVICE.now() - firedAt;
+			const approximateFiredFrom = approximateLaserCurrentCFrame(firedAtSecAgo, firedFrom);
+			const laser = LaserModel.createWithId(laserId, approximateFiredFrom);
+			laser.renderAsTracer(firedAtSecAgo);
+
 			LASER_FIRED_EXTERNAL.dispatchToAllClients(laserId, firedBy, firedAt, firedFrom);
-		});
-
-		LASER_HIT_EXTERNAL.onServerEvent((reportedBy: Player, laserId: string) => {
-			if (!LASER_TRACKER.isTracked(laserId)) {
-				// The laser event for this laserId was never tracked or already untracked.
-				return;
-			}
-
-			const hits = LASER_TRACKER.detectHits(laserId);
-			LASER_TRACKER.untrack(laserId);
-
-			const humanoid = getHumanoid(hits);
-			if (t.instanceIsA("Humanoid")(humanoid)) {
-				humanoid.TakeDamage(LASER_DAMAGE);
-			}
 		});
 	}
 }

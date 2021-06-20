@@ -1,12 +1,10 @@
 import { Debris, HttpService, Workspace } from "@rbxts/services";
 import { LaserTemplate } from "shared/lasers/LaserTemplate/LaserTemplate";
 import { Model } from "shared/util/models";
-import { LASER_LIFETIME_SEC, LASER_SPEED_STUDS_PER_SEC } from "shared/lasers/LasersConstants";
-import { LaserHitExternal } from "shared/Events/LaserHitExternal/LaserHitExternal";
+import { LASER_DAMAGE, LASER_LIFETIME_SEC, LASER_SPEED_STUDS_PER_SEC } from "shared/lasers/LasersConstants";
 import { LaserCollisionGroup } from "shared/lasers/LaserCollisionGroup";
 import { FireAudio } from "shared/Sounds/Fire/FireAudio";
 
-const LASER_HIT_EXTERNAL = new LaserHitExternal();
 const LASER_COLLISION_GROUP = LaserCollisionGroup.getInstance();
 const FIRE_AUDIO = new FireAudio();
 
@@ -44,6 +42,22 @@ export class LaserModel extends Model {
 		Debris.AddItem(this.part, LASER_LIFETIME_SEC);
 	}
 
+	renderAsTracer(firedAtSecAgo: number) {
+		this.part.Touched.Connect((otherPart: BasePart) => {
+			if (!this.canCollideWith(otherPart)) {
+				return;
+			}
+			const humanoid = this.getHumanoid(otherPart);
+			if (humanoid) {
+				humanoid.TakeDamage(LASER_DAMAGE);
+			}
+			this.part.Destroy();
+		});
+		this.setColor(new Color3(1, 1, 0));
+		this.part.Parent = Workspace;
+		Debris.AddItem(this.part, LASER_LIFETIME_SEC - firedAtSecAgo);
+	}
+
 	getLaserId() {
 		return this.laserId;
 	}
@@ -56,7 +70,18 @@ export class LaserModel extends Model {
 		if (otherPart.IsDescendantOf(Workspace) && !this.part.CanCollideWith(otherPart)) {
 			return;
 		}
-		LASER_HIT_EXTERNAL.dispatchToServer(this.laserId);
+		// TODO(jared) Render hitbox for the person who fired this.
 		this.part.Destroy();
+	}
+
+	private canCollideWith(otherPart: BasePart) {
+		return otherPart.IsDescendantOf(Workspace) && this.part.CanCollideWith(otherPart);
+	}
+
+	private getHumanoid(part: BasePart) {
+		const parent = part.Parent;
+		const grandparent = parent?.Parent;
+		const humanoid = parent?.FindFirstChildWhichIsA("Humanoid") || grandparent?.FindFirstChildWhichIsA("Humanoid");
+		return humanoid;
 	}
 }

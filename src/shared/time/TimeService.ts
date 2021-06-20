@@ -35,9 +35,9 @@ export class TimeService {
 			return;
 		}
 
-		const clientTimeSec1 = tick();
+		const clientTimeSec1 = this.now();
 		const serverTimeSec = ACK.invokeServer();
-		const clientTimeSec2 = tick();
+		const clientTimeSec2 = this.now();
 
 		const pingSec = clientTimeSec2 - clientTimeSec1;
 		this.pingsSec.push(pingSec);
