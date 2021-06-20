@@ -50,7 +50,7 @@ export class LaserModel extends Model {
 	}
 
 	private onTouched(otherPart: BasePart) {
-		if (!this.part.CanCollideWith(otherPart)) {
+		if (otherPart.IsDescendantOf(Workspace) && !this.part.CanCollideWith(otherPart)) {
 			return;
 		}
 		LASER_HIT_EXTERNAL.dispatchToServer(this.laserId);
