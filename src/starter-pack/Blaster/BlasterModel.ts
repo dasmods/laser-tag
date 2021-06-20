@@ -11,11 +11,13 @@ import {
 	RELOADING_TOOL_TEXTURE,
 	RELOAD_TIME_SEC,
 } from "starter-pack/Blaster/BlasterConstants";
+import { PrimeAudio } from "shared/Sounds/Prime/PrimeAudio";
 
 type Callback = (blaster: BlasterModel) => void;
 
 const LASER_FIRED_INTERNAL = new LaserFiredInternal();
 const LOCAL_PLAYER = Players.LocalPlayer;
+const PRIME_AUDIO = new PrimeAudio();
 
 export class BlasterModel extends Model {
 	private tool: Tool;
@@ -66,6 +68,7 @@ export class BlasterModel extends Model {
 		await Promise.delay(RELOAD_TIME_SEC);
 		this.ammo = MAX_AMMO;
 		this.tool.TextureId = DEFAULT_TOOL_TEXTURE;
+		PRIME_AUDIO.playLocal();
 	}
 
 	private async doFire() {

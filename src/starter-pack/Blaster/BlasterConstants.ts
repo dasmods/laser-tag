@@ -4,3 +4,4 @@ export const RELOAD_TIME_SEC = 2;
 export const RELOADING_TOOL_TEXTURE = "rbxassetid://6593020923";
 export const DEFAULT_TOOL_TEXTURE = "rbxassetid://92628145";
 export const EMPTY_TOOL_TEXTURE = "rbxassetid://6198684081";
+export const EQUIP_AUDIO = "rbxassetid://6925284499";

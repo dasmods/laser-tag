@@ -4,9 +4,11 @@ import { Model } from "shared/util/models";
 import { LASER_LIFETIME_SEC, LASER_SPEED_STUDS_PER_SEC } from "shared/lasers/LasersConstants";
 import { LaserHitExternal } from "shared/Events/LaserHitExternal/LaserHitExternal";
 import { LaserCollisionGroup } from "shared/lasers/LaserCollisionGroup";
+import { FireAudio } from "shared/Sounds/Fire/FireAudio";
 
 const LASER_HIT_EXTERNAL = new LaserHitExternal();
 const LASER_COLLISION_GROUP = LaserCollisionGroup.getInstance();
+const FIRE_AUDIO = new FireAudio();
 
 export class LaserModel extends Model {
 	static create(firedFrom: CFrame): LaserModel {
@@ -38,6 +40,7 @@ export class LaserModel extends Model {
 	render() {
 		this.part.Touched.Connect((otherPart: BasePart) => this.onTouched(otherPart));
 		this.part.Parent = Workspace;
+		FIRE_AUDIO.playLocal();
 		Debris.AddItem(this.part, LASER_LIFETIME_SEC);
 	}
 
