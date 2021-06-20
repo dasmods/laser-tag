@@ -1,4 +1,4 @@
-import { Players, RunService, UserInputService, Workspace } from "@rbxts/services";
+import { ContextActionService, Players, RunService, UserInputService, Workspace } from "@rbxts/services";
 import { t } from "@rbxts/t";
 import { CameraFSM, createCameraFSM } from "client/camera/CameraFSM";
 import { Model } from "shared/util/models";
@@ -6,6 +6,7 @@ import { Model } from "shared/util/models";
 const LOCAL_PLAYER = Players.LocalPlayer;
 const THIRD_PERSON_CAMERA = "ThirdPersonCamera";
 const FREE_MOUSE_CAMERA = "FreeMouseCamera";
+const ACTIVATE_FREE_MOUSE_CAMERA = "ActivateFreeMouseCamera";
 
 export class CameraModel extends Model {
 	fsm: CameraFSM | undefined;
@@ -18,9 +19,22 @@ export class CameraModel extends Model {
 			onThirdPersonExit: () => {
 				this.onThirdPersonExit();
 			},
-			onFreeMouseEnter: () => {},
-			onFreeMouseExit: () => {},
+			onFreeMouseEnter: () => {
+				this.onFreeMouseEnter();
+			},
+			onFreeMouseExit: () => {
+				this.onFreeMouseExit();
+			},
 		});
+
+		ContextActionService.BindAction(
+			ACTIVATE_FREE_MOUSE_CAMERA,
+			(actionName, inputState) => {
+				this.onActivateFreeMouseCameraAction(actionName, inputState);
+			},
+			false,
+			Enum.KeyCode.LeftAlt,
+		);
 
 		this.fsm.dispatch({ type: "changeState", to: "thirdPerson" });
 	}
@@ -31,9 +45,29 @@ export class CameraModel extends Model {
 		return camera;
 	}
 
+	private onActivateFreeMouseCameraAction(actionName: string, inputState: Enum.UserInputState) {
+		if (actionName !== ACTIVATE_FREE_MOUSE_CAMERA) {
+			return;
+		}
+
+		const fsm = this.fsm;
+		if (t.nil(fsm)) {
+			return;
+		}
+
+		switch (inputState) {
+			case Enum.UserInputState.Begin:
+				fsm.dispatch({ type: "changeState", to: "freeMouse" });
+				break;
+			case Enum.UserInputState.End:
+				fsm.dispatch({ type: "changeState", to: "thirdPerson" });
+				break;
+		}
+	}
+
 	private onThirdPersonEnter() {
 		RunService.BindToRenderStep(THIRD_PERSON_CAMERA, Enum.RenderPriority.Last.Value + 1, () => {
-			this.lockMousePosition();
+			this.lockMousePositionToCenter();
 		});
 	}
 
@@ -43,7 +77,9 @@ export class CameraModel extends Model {
 
 	private onFreeMouseEnter() {}
 
-	private lockMousePosition() {
+	private onFreeMouseExit() {}
+
+	private lockMousePositionToCenter() {
 		UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter;
 	}
 }
