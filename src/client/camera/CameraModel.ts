@@ -5,8 +5,7 @@ import { Model } from "shared/util/models";
 
 const LOCAL_PLAYER = Players.LocalPlayer;
 const THIRD_PERSON_CAMERA = "ThirdPersonCamera";
-const FREE_MOUSE_CAMERA = "FreeMouseCamera";
-const ACTIVATE_FREE_MOUSE_CAMERA = "ActivateFreeMouseCamera";
+const ACTIVATE_FREE_MOUSE_CAMERA = "ActivateFreeLook";
 
 export class CameraModel extends Model {
 	fsm: CameraFSM | undefined;
@@ -19,18 +18,12 @@ export class CameraModel extends Model {
 			onThirdPersonExit: () => {
 				this.onThirdPersonExit();
 			},
-			onFreeMouseEnter: () => {
-				this.onFreeMouseEnter();
-			},
-			onFreeMouseExit: () => {
-				this.onFreeMouseExit();
-			},
 		});
 
 		ContextActionService.BindAction(
 			ACTIVATE_FREE_MOUSE_CAMERA,
 			(actionName, inputState) => {
-				this.onActivateFreeMouseCameraAction(actionName, inputState);
+				this.onActivateFreeLookCameraAction(actionName, inputState);
 			},
 			false,
 			Enum.KeyCode.LeftAlt,
@@ -45,7 +38,7 @@ export class CameraModel extends Model {
 		return camera;
 	}
 
-	private onActivateFreeMouseCameraAction(actionName: string, inputState: Enum.UserInputState) {
+	private onActivateFreeLookCameraAction(actionName: string, inputState: Enum.UserInputState) {
 		if (actionName !== ACTIVATE_FREE_MOUSE_CAMERA) {
 			return;
 		}
@@ -57,7 +50,7 @@ export class CameraModel extends Model {
 
 		switch (inputState) {
 			case Enum.UserInputState.Begin:
-				fsm.dispatch({ type: "changeState", to: "freeMouse" });
+				fsm.dispatch({ type: "changeState", to: "freeLook" });
 				break;
 			case Enum.UserInputState.End:
 				fsm.dispatch({ type: "changeState", to: "thirdPerson" });
@@ -74,10 +67,6 @@ export class CameraModel extends Model {
 	private onThirdPersonExit() {
 		RunService.UnbindFromRenderStep(THIRD_PERSON_CAMERA);
 	}
-
-	private onFreeMouseEnter() {}
-
-	private onFreeMouseExit() {}
 
 	private lockMousePositionToCenter() {
 		UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter;

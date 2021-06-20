@@ -1,6 +1,6 @@
 import { FSM, Transition } from "shared/fsm/fsm";
 
-type CameraStates = "default" | "thirdPerson" | "freeMouse";
+type CameraStates = "default" | "thirdPerson" | "freeLook";
 
 type CameraEvents = { type: "changeState"; to: Exclude<CameraStates, "default"> };
 
@@ -9,8 +9,6 @@ export type CameraFSM = FSM<CameraStates, CameraEvents>;
 export type CameraFSMParams = {
 	onThirdPersonEnter: () => void;
 	onThirdPersonExit: () => void;
-	onFreeMouseEnter: () => void;
-	onFreeMouseExit: () => void;
 };
 
 const changeState: Transition<CameraStates, CameraEvents> = { to: (event: CameraEvents): CameraStates => event.to };
@@ -29,10 +27,8 @@ export const createCameraFSM = (params: CameraFSMParams) => {
 				exit: params.onThirdPersonExit,
 				transitions: { changeState },
 			},
-			freeMouse: {
+			freeLook: {
 				type: "sync",
-				enter: params.onFreeMouseEnter,
-				exit: params.onFreeMouseExit,
 				transitions: { changeState },
 			},
 		},
