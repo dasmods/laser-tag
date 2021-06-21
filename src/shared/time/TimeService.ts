@@ -27,7 +27,7 @@ export class TimeService {
 		if (IS_SERVER) {
 			return tick();
 		}
-		return tick() + this.getAvgOffsetSec();
+		return tick() - this.getAvgOffsetSec();
 	}
 
 	sync() {
@@ -35,9 +35,9 @@ export class TimeService {
 			return;
 		}
 
-		const clientTimeSec1 = this.now();
+		const clientTimeSec1 = tick();
 		const serverTimeSec = ACK.invokeServer();
-		const clientTimeSec2 = this.now();
+		const clientTimeSec2 = tick();
 
 		const pingSec = clientTimeSec2 - clientTimeSec1;
 		this.pingsSec.push(pingSec);
