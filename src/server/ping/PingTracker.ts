@@ -17,6 +17,9 @@ type Ping = {
 	userId: number;
 };
 
+type PingStore = { [userId: number]: TTLStore<Ping> | undefined };
+type AvgPingSecStore = { [userId: number]: RunningAverage | undefined };
+
 const TIME_SERVICE = TimeService.getInstance();
 const PING = new PingExternalEvent();
 
@@ -30,27 +33,26 @@ export class PingTracker {
 		return PingTracker.cache;
 	}
 
-	private pingsByPingId = new TTLStore<Ping>(PING_TTL_SEC);
-	private pingsByUserId: Record<number, TTLStore<Ping> | undefined> = {};
-	private avgPingSecByUserId: Record<number, RunningAverage | undefined> = {};
+	private pings: PingStore = {};
+	private avgs: AvgPingSecStore = {};
 	private trackedPlayers = new Set<Player>();
 
 	private constructor() {}
 
 	track(player: Player) {
 		this.trackedPlayers.add(player);
-		this.avgPingSecByUserId[player.UserId] = new RunningAverage(PING_RUNNING_AVG_SIZE);
-		this.pingsByUserId[player.UserId] = new TTLStore<Ping>(PING_TTL_SEC);
+		this.avgs[player.UserId] = new RunningAverage(PING_RUNNING_AVG_SIZE);
+		this.pings[player.UserId] = new TTLStore<Ping>(PING_TTL_SEC);
 	}
 
 	untrack(player: Player) {
 		this.trackedPlayers.delete(player);
-		this.avgPingSecByUserId[player.UserId] = undefined;
-		this.pingsByUserId[player.UserId] = undefined;
+		this.avgs[player.UserId] = undefined;
+		this.pings[player.UserId] = undefined;
 	}
 
 	getAvgPingSec(player: Player): number {
-		const avgPingSec = this.avgPingSecByUserId[player.UserId];
+		const avgPingSec = this.avgs[player.UserId];
 		if (t.nil(avgPingSec) || !avgPingSec.isDefined()) {
 			return DEFAULT_PING_SEC;
 		}
@@ -67,26 +69,16 @@ export class PingTracker {
 	}
 
 	receivePing(player: Player, pingId: string) {
-		const now = TIME_SERVICE.now();
+		const receivedAt = TIME_SERVICE.now();
 
-		const ping = this.pingsByPingId.get(pingId);
+		const ping = this.pings[player.UserId]?.get(pingId);
 		if (t.nil(ping)) {
 			return;
 		}
-		if (ping.userId !== player.UserId) {
-			return;
-		}
+
 		this.unregisterPing(ping);
 
-		let avgPingSec = this.avgPingSecByUserId[player.UserId];
-		if (t.nil(avgPingSec)) {
-			avgPingSec = new RunningAverage(PING_RUNNING_AVG_SIZE);
-			this.avgPingSecByUserId[player.UserId] = avgPingSec;
-		}
-		assert(!t.nil(avgPingSec));
-
-		const pingSec = now - ping.createdAt;
-		avgPingSec.push(pingSec);
+		this.updateAvgSec(ping, receivedAt);
 	}
 
 	private sendPing(player: Player) {
@@ -101,29 +93,19 @@ export class PingTracker {
 	}
 
 	private registerPing(ping: Ping) {
-		if (t.nil(this.pingsByUserId[ping.userId])) {
-			this.pingsByUserId[ping.userId] = new TTLStore<Ping>(PING_TTL_SEC);
-		}
-		const userPings = this.pingsByUserId[ping.userId];
-		assert(!t.nil(userPings));
-
-		userPings.set(ping.pingId, ping);
-		this.pingsByPingId.set(ping.pingId, ping);
+		this.pings[ping.userId]?.set(ping.pingId, ping);
 	}
 
 	private unregisterPing(ping: Ping) {
-		const userPings = this.pingsByUserId[ping.userId];
-		if (!t.nil(userPings)) {
-			userPings.remove(ping.pingId);
-		}
-		this.pingsByPingId.remove(ping.pingId);
+		this.pings[ping.userId]?.remove(ping.pingId);
+	}
+
+	private updateAvgSec(ping: Ping, receivedAt: number) {
+		this.avgs[ping.userId]?.push(receivedAt - ping.createdAt);
 	}
 
 	private getNumPingsInFlight(player: Player): number {
-		const userPings = this.pingsByUserId[player.UserId];
-		if (t.nil(userPings)) {
-			return 0;
-		}
-		return userPings.getSize();
+		const numPingsInFlight = this.pings[player.UserId]?.getSize();
+		return t.number(numPingsInFlight) ? numPingsInFlight : 0;
 	}
 }
