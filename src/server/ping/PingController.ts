@@ -1,3 +1,5 @@
+import { Players, RunService } from "@rbxts/services";
+import { PING_FREQUENCY_HZ } from "server/ping/PingConstants";
 import { PingTracker } from "server/ping/PingTracker";
 import { Ping } from "shared/Events/Ping/Ping";
 import { ServerController } from "shared/util/controllers";
@@ -9,6 +11,18 @@ export class PingController extends ServerController {
 	init() {
 		PING.onServerEvent((player, pingId) => {
 			PING_TRACKER.receivePing(player, pingId);
+		});
+
+		Players.PlayerAdded.Connect((player) => {
+			PING_TRACKER.track(player);
+		});
+
+		Players.PlayerRemoving.Connect((player) => {
+			PING_TRACKER.untrack(player);
+		});
+
+		RunService.Heartbeat.Connect(() => {
+			PING_TRACKER.sendPings();
 		});
 	}
 }

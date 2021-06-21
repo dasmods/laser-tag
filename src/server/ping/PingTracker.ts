@@ -1,6 +1,6 @@
 import { HttpService } from "@rbxts/services";
 import { t } from "@rbxts/t";
-import { DEFAULT_PING_SEC, IN_FLIGHT_PING_TTL_SEC, PING_RUNNING_AVG_SIZE } from "server/ping/PingConstants";
+import { DEFAULT_PING_SEC, PING_TTL_SEC, PING_RUNNING_AVG_SIZE } from "server/ping/PingConstants";
 import { Ping as PingExternalEvent } from "shared/Events/Ping/Ping";
 import { TimeService } from "shared/time/TimeService";
 import { RunningAverage } from "shared/util/RunningAverage";
@@ -25,10 +25,21 @@ export class PingTracker {
 		return PingTracker.cache;
 	}
 
-	private pingsByPingId = new TTLStore<Ping>(IN_FLIGHT_PING_TTL_SEC);
-	private avgPingSecByUserId: Record<number, RunningAverage> = {};
+	private pingsByPingId = new TTLStore<Ping>(PING_TTL_SEC);
+	private avgPingSecByUserId: Record<number, RunningAverage | undefined> = {};
+	private trackedPlayers = new Set<Player>();
 
 	private constructor() {}
+
+	track(player: Player) {
+		this.trackedPlayers.add(player);
+		this.avgPingSecByUserId[player.UserId] = new RunningAverage(PING_RUNNING_AVG_SIZE);
+	}
+
+	untrack(player: Player) {
+		this.trackedPlayers.delete(player);
+		this.avgPingSecByUserId[player.UserId] = undefined;
+	}
 
 	getAvgPingSec(player: Player): number {
 		const avgPingSec = this.avgPingSecByUserId[player.UserId];
@@ -38,9 +49,21 @@ export class PingTracker {
 		return avgPingSec.get();
 	}
 
-	sendPing(player: Player) {
-		const ping = this.generatePing(player);
-		PING.dispatchToClient(player, ping.pingId);
+	sendPings() {
+		for (const player of this.trackedPlayers) {
+			this.sendPing(player);
+		}
+	}
+
+	private sendPing(player: Player) {
+		const createdAt = TIME_SERVICE.now();
+		const pingId = HttpService.GenerateGUID(false);
+		const userId = player.UserId;
+		const ping = { pingId, createdAt, userId };
+
+		this.pingsByPingId.set(pingId, ping);
+
+		PING.dispatchToClient(player, pingId);
 	}
 
 	receivePing(player: Player, pingId: string) {
@@ -60,19 +83,9 @@ export class PingTracker {
 			avgPingSec = new RunningAverage(PING_RUNNING_AVG_SIZE);
 			this.avgPingSecByUserId[player.UserId] = avgPingSec;
 		}
+		assert(!t.nil(avgPingSec));
 
 		const pingSec = now - ping.createdAt;
 		avgPingSec.push(pingSec);
-	}
-
-	private generatePing(player: Player): Ping {
-		const createdAt = TIME_SERVICE.now();
-		const pingId = HttpService.GenerateGUID(false);
-		const userId = player.UserId;
-		const ping = { pingId, createdAt, userId };
-
-		this.pingsByPingId.set(pingId, ping);
-
-		return ping;
 	}
 }
