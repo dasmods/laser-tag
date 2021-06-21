@@ -12,7 +12,12 @@ export class CircularArray<T> {
 
 	push(value: T) {
 		this.values[this.ndx] = value;
-		this.ndx = (this.ndx + 1) % this.capacity;
+		this.ndx = this.getNextIndex();
+	}
+
+	peekNext(): T | undefined {
+		const nextIndex = this.getNextIndex();
+		return this.values[nextIndex];
 	}
 
 	getValues(): T[] {
@@ -21,5 +26,9 @@ export class CircularArray<T> {
 
 	getLength(): number {
 		return this.values.size();
+	}
+
+	private getNextIndex() {
+		return (this.ndx + 1) % this.capacity;
 	}
 }
