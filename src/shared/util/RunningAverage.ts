@@ -25,7 +25,7 @@ export class RunningAverage {
 		return this.getCount() > 0;
 	}
 
-	hasReachedSize(): boolean {
+	isWellDefined(): boolean {
 		return this.getCount() === this.size;
 	}
 
