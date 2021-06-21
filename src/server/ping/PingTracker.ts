@@ -15,14 +15,14 @@ type Ping = {
 const TIME_SERVICE = TimeService.getInstance();
 const PING = new PingExternalEvent();
 
-export class PingTrackerService {
-	private static cache: PingTrackerService | undefined;
+export class PingTracker {
+	private static cache: PingTracker | undefined;
 
-	static getInstance(): PingTrackerService {
-		if (t.nil(PingTrackerService.cache)) {
-			PingTrackerService.cache = new PingTrackerService();
+	static getInstance(): PingTracker {
+		if (t.nil(PingTracker.cache)) {
+			PingTracker.cache = new PingTracker();
 		}
-		return PingTrackerService.cache;
+		return PingTracker.cache;
 	}
 
 	private pingsByPingId = new TTLStore<Ping>(IN_FLIGHT_PING_TTL_SEC);
@@ -43,11 +43,14 @@ export class PingTrackerService {
 		PING.dispatchToClient(player, ping.pingId);
 	}
 
-	receivePing(pingId: string, player: Player) {
+	receivePing(player: Player, pingId: string) {
 		const now = TIME_SERVICE.now();
 
 		const ping = this.pingsByPingId.get(pingId);
 		if (t.nil(ping)) {
+			return;
+		}
+		if (ping.userId !== player.UserId) {
 			return;
 		}
 		this.pingsByPingId.remove(pingId);
