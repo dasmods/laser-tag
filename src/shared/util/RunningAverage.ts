@@ -1,5 +1,6 @@
 import { t } from "@rbxts/t";
 import { CircularArray } from "shared/util/CircularArray";
+import { sum } from "shared/util/math";
 
 export class RunningAverage {
 	readonly size: number;
@@ -13,7 +14,7 @@ export class RunningAverage {
 	}
 
 	push(value: number) {
-		const nextValue = this.values.peekNext();
+		const nextValue = this.values.peek();
 		if (t.number(nextValue)) {
 			this.sum -= nextValue;
 		}

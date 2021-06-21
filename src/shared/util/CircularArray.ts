@@ -15,9 +15,8 @@ export class CircularArray<T> {
 		this.ndx = this.getNextIndex();
 	}
 
-	peekNext(): T | undefined {
-		const nextIndex = this.getNextIndex();
-		return this.values[nextIndex];
+	peek(): T | undefined {
+		return this.values[this.ndx];
 	}
 
 	getValues(): T[] {
