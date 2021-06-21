@@ -41,7 +41,9 @@ export class TimeService {
 		const pingSec = clientTimeSec2 - clientTimeSec1;
 		this.avgPingSec.push(pingSec);
 
-		const offsetSec = clientTimeSec1 - serverTimeSec;
+		const timeToReceiveAckSec = pingSec / 2;
+		const approximateCurrentServerTimeSec = serverTimeSec + timeToReceiveAckSec;
+		const offsetSec = clientTimeSec2 - approximateCurrentServerTimeSec;
 		this.avgOffsetSec.push(offsetSec);
 	}
 
