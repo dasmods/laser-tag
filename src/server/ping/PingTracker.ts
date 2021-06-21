@@ -79,7 +79,7 @@ export class PingTracker {
 		this.unregisterPing(ping);
 
 		let avgPingSec = this.avgPingSecByUserId[player.UserId];
-		if (t.nil(ping)) {
+		if (t.nil(avgPingSec)) {
 			avgPingSec = new RunningAverage(PING_RUNNING_AVG_SIZE);
 			this.avgPingSecByUserId[player.UserId] = avgPingSec;
 		}
