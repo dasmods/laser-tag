@@ -1,10 +1,7 @@
 import { HttpService } from "@rbxts/services";
 import { t } from "@rbxts/t";
-import {
-	DEFAULT_PING_SEC,
-	IN_FLIGHT_PING_TTL_SEC,
-	PING_RUNNING_AVG_SIZE,
-} from "server/ping-tracker/PingTrackerConstants";
+import { DEFAULT_PING_SEC, IN_FLIGHT_PING_TTL_SEC, PING_RUNNING_AVG_SIZE } from "server/ping/PingConstants";
+import { Ping as PingExternalEvent } from "shared/Events/Ping/Ping";
 import { TimeService } from "shared/time/TimeService";
 import { RunningAverage } from "shared/util/RunningAverage";
 import { TTLStore } from "shared/util/TTLStore";
@@ -16,6 +13,7 @@ type Ping = {
 };
 
 const TIME_SERVICE = TimeService.getInstance();
+const PING = new PingExternalEvent();
 
 export class PingTrackerService {
 	private static cache: PingTrackerService | undefined;
@@ -42,6 +40,7 @@ export class PingTrackerService {
 
 	sendPing(player: Player) {
 		const ping = this.generatePing(player);
+		PING.dispatchToClient(player, ping.pingId);
 	}
 
 	receivePing(pingId: string, player: Player) {
