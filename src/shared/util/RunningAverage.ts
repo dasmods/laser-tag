@@ -1,6 +1,5 @@
 import { t } from "@rbxts/t";
 import { CircularArray } from "shared/util/CircularArray";
-import { sum } from "shared/util/math";
 
 export class RunningAverage {
 	readonly size: number;
