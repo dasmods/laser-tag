@@ -21,10 +21,22 @@ export class RunningAverage {
 		this.sum += value;
 	}
 
+	/**
+	 * Determines if there is at least 1 value to consider the average
+	 * defined.
+	 */
 	isDefined(): boolean {
 		return this.getCount() > 0;
 	}
 
+	/**
+	 * Determines if the running average has as many values as the caller
+	 * constructed it with. For example, if a new RunningAverage(5) can
+	 * return a running average after 2 data points, but it is not well defined.
+	 * It's well defined after it collects at least 5 data points. It is
+	 * up to the caller to determine whether or not to wait for the average
+	 * to be well defined or not.
+	 */
 	isWellDefined(): boolean {
 		return this.getCount() === this.size;
 	}

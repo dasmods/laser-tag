@@ -2,8 +2,7 @@ import { RunService } from "@rbxts/services";
 import { t } from "@rbxts/t";
 import { Ack } from "shared/RemoteFunctions/Ack/Ack";
 import { RUNNING_AVG_SIZE } from "shared/time/TimeConstants";
-import { CircularArray } from "shared/util/CircularArray";
-import { avg } from "shared/util/math";
+import { RunningAverage } from "shared/util/RunningAverage";
 
 const ACK = new Ack();
 const IS_SERVER = RunService.IsServer();
@@ -18,8 +17,8 @@ export class TimeService {
 		return TimeService.cache;
 	}
 
-	private pingsSec: CircularArray<number> = new CircularArray(RUNNING_AVG_SIZE);
-	private offsetsSec: CircularArray<number> = new CircularArray(RUNNING_AVG_SIZE);
+	private avgPingSec = new RunningAverage(RUNNING_AVG_SIZE);
+	private avgOffsetSec = new RunningAverage(RUNNING_AVG_SIZE);
 
 	private constructor() {}
 
@@ -40,25 +39,17 @@ export class TimeService {
 		const clientTimeSec2 = tick();
 
 		const pingSec = clientTimeSec2 - clientTimeSec1;
-		this.pingsSec.push(pingSec);
+		this.avgPingSec.push(pingSec);
 
 		const offsetSec = clientTimeSec1 - serverTimeSec;
-		this.offsetsSec.push(offsetSec);
+		this.avgOffsetSec.push(offsetSec);
 	}
 
 	getAvgPingSec() {
-		const numPings = this.pingsSec.getLength();
-		if (numPings === 0) {
-			return 0;
-		}
-		return avg(this.pingsSec.getValues());
+		return this.avgPingSec.isDefined() ? this.avgPingSec.get() : 0;
 	}
 
 	getAvgOffsetSec() {
-		const numOffsets = this.offsetsSec.getLength();
-		if (numOffsets === 0) {
-			return 0;
-		}
-		return avg(this.offsetsSec.getValues());
+		return this.avgOffsetSec.isDefined() ? this.avgOffsetSec.get() : 0;
 	}
 }
