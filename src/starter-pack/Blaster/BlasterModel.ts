@@ -1,8 +1,9 @@
+import { Players, UserInputService, Workspace } from "@rbxts/services";
+import { t } from "@rbxts/t";
 import { LaserFiredInternal } from "shared/Events/LaserFiredInternal/LaserFiredInternal";
-import { LASER_SIZE_Z_STUDS, LASER_Y_OFFSET_STUDS, LASER_Z_OFFSET_STUDS } from "shared/lasers/LasersConstants";
+import { LASER_MAX_AIM_DISTANCE_STUDS } from "shared/lasers/LasersConstants";
+import { PrimeAudio } from "shared/Sounds/Prime/PrimeAudio";
 import { Model } from "shared/util/models";
-import { Players } from "@rbxts/services";
-import { BlasterFSM, createBlasterFSM } from "starter-pack/Blaster/BlasterFSM";
 import {
 	DEFAULT_TOOL_TEXTURE,
 	EMPTY_TOOL_TEXTURE,
@@ -11,7 +12,7 @@ import {
 	RELOADING_TOOL_TEXTURE,
 	RELOAD_TIME_SEC,
 } from "starter-pack/Blaster/BlasterConstants";
-import { PrimeAudio } from "shared/Sounds/Prime/PrimeAudio";
+import { BlasterFSM, createBlasterFSM } from "starter-pack/Blaster/BlasterFSM";
 
 type Callback = (blaster: BlasterModel) => void;
 
@@ -79,14 +80,64 @@ export class BlasterModel extends Model {
 	}
 
 	private calculateFiredFrom(): CFrame {
-		const cFrame = LOCAL_PLAYER.GetMouse().Origin;
-		const offsetMagnitudeZ = -(LASER_SIZE_Z_STUDS / 2) - LASER_Z_OFFSET_STUDS;
-		const offsetMagnitudeY = LASER_Y_OFFSET_STUDS;
-		const offsetCFrame = new CFrame(0, offsetMagnitudeY, offsetMagnitudeZ);
-		return cFrame.ToWorldSpace(offsetCFrame);
+		const muzzlePosition = this.getMuzzlePosition();
+		const crosshairsTargetPosition = this.getCrosshairsTargetPosition();
+
+		// TODO(jared) Remove when done testing.
+		this.renderPosition(muzzlePosition);
+
+		// TODO(jared) By default, the pivot point is in the MIDDLE of the laser.
+		// The problem that this causes is that lookAt will re-orient the laser
+		// along that axis, which changes the butt of the laser to not come out
+		// of the muzzle.
+		//
+		// There is a new experiemental pivot API that can change the pivot point.
+		// We might need to roll out our own CFrame.lookAt because we cannot change
+		// the pivot point of something that doesn't exist.
+		//
+		// https://devforum.roblox.com/t/pivot-points-studio-beta/1180689
+
+		return CFrame.lookAt(muzzlePosition, crosshairsTargetPosition);
+	}
+
+	private getMuzzlePosition(): Vector3 {
+		const offsetCFrame = new CFrame(0, 0, -1.75);
+		return this.handle.CFrame.ToWorldSpace(offsetCFrame).Position;
+	}
+
+	private getCrosshairsTargetPosition(): Vector3 {
+		const camera = this.getCamera();
+
+		const crosshairLocation = UserInputService.GetMouseLocation();
+		const crosshairRay = camera.ViewportPointToRay(crosshairLocation.X, crosshairLocation.Y);
+		const crosshairMaxAimDistanceVector = crosshairRay.Direction.mul(LASER_MAX_AIM_DISTANCE_STUDS);
+		const crosshairRaycastResult = Workspace.Raycast(crosshairRay.Origin, crosshairMaxAimDistanceVector);
+
+		if (crosshairRaycastResult) {
+			return crosshairRaycastResult.Position;
+		} else {
+			return crosshairRay.Origin.add(crosshairMaxAimDistanceVector);
+		}
+	}
+
+	private renderPosition(position: Vector3) {
+		const part = new Instance("Part", Workspace);
+		part.Anchored = true;
+		part.Color = new Color3(1, 0, 0);
+		part.Transparency = 0.5;
+		part.Position = position;
+		part.Size = new Vector3(0.1, 5, 0.1);
 	}
 
 	private onEmpty() {
 		this.tool.TextureId = EMPTY_TOOL_TEXTURE;
+	}
+
+	private getCamera() {
+		const camera = Workspace.CurrentCamera;
+		if (t.nil(camera)) {
+			error("no current camera on workspace");
+		}
+		return camera;
 	}
 }
