@@ -26,7 +26,8 @@
 		},
 		"StarterPack": {
 			"$className": "StarterPack",
-			"$path": "out/starter-pack"
+			"$path": "out/starter-pack",
+			"$ignoreUnknownInstances": true
 		},
 		"StarterPlayer": {
 			"$className": "StarterPlayer",
