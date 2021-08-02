@@ -86,6 +86,8 @@ export class BlasterModel extends Model {
 		// TODO(jared) Remove when done testing.
 		this.renderPosition(muzzlePosition);
 
+		// TODO(jared) Look at this: https://devforum.roblox.com/t/how-do-i-create-a-third-person-aim-script/964777
+
 		// TODO(jared) By default, the pivot point is in the MIDDLE of the laser.
 		// The problem that this causes is that lookAt will re-orient the laser
 		// along that axis, which changes the butt of the laser to not come out
